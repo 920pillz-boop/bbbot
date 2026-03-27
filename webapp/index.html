@@ -178,7 +178,7 @@ let state = { isAdmin:false, profile:null, year:0, month:0, adminFilter:'all', c
 
 // ─── API ───────────────────────────────────────────────────────────────────
 async function api(path, opts={}) {
-  const hdrs = { 'Content-Type':'application/json', 'Bypass-Tunnel-Reminder':'true', 'X-Pinggy-No-Screen':'true' };
+  const hdrs = { 'Content-Type':'application/json' };
   if (AUTH) hdrs['Authorization'] = AUTH;
   if (HAS_SIGNED) { hdrs['X-TG-ID']=SIGNED.tg_id; hdrs['X-TG-User']=SIGNED.user; hdrs['X-TG-Admin']=SIGNED.adm; hdrs['X-TG-TS']=SIGNED.ts; hdrs['X-TG-Sig']=SIGNED.sig; }
   const res = await fetch(path, { ...opts, headers:{...hdrs,...(opts.headers||{})} });
