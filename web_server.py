@@ -136,7 +136,7 @@ async def cors_middleware(request, handler):
     else:
         resp = await handler(request)
     resp.headers["Access-Control-Allow-Origin"] = "*"
-    resp.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
+    resp.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, X-TG-ID, X-TG-User, X-TG-Admin, X-TG-TS, X-TG-Sig"
     resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     return resp
 
