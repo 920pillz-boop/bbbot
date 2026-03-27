@@ -447,7 +447,7 @@ async function openModelDetail(tgId) {
     </div>`
   ).join('');
 
-  // Сетка доходов (compact)
+  // Календарь доходов для профиля модели (admin)
   const plats = det.platforms.filter(p=>p.assigned);
   const days = daysInMonth(state.year, state.month);
   const eMap = {};
@@ -459,20 +459,26 @@ async function openModelDetail(tgId) {
   const rMap = {};
   Object.entries(earData.ref_bonuses||{}).forEach(([dt,amt])=>{ rMap[parseInt(dt.split('-')[2])]=amt; });
 
-  let gridRows='', platTots={}, refTot=0;
-  plats.forEach(p=>{ platTots[p.id]=0; });
-  for (let d=1;d<=days;d++) {
-    const dd=eMap[d]||{}; const ra=rMap[d]||0; let dt=0; let has=false;
-    let cells=plats.map(p=>{ const a=dd[p.id]||0; if(a){platTots[p.id]+=a;dt+=a;has=true;} return a?`<td class="td-amount">$${a.toFixed(0)}</td>`:`<td class="td-empty">—</td>`; }).join('');
-    if(ra){refTot+=ra;dt+=ra;has=true;}
-    const rc=ra?`<td class="td-ref">$${ra.toFixed(0)}</td>`:`<td class="td-empty">—</td>`;
-    if(!has) continue;
-    gridRows+=`<tr><td>${String(d).padStart(2,'0')}</td>${cells}${rc}<td class="td-total">$${dt.toFixed(0)}</td></tr>`;
+  let refTot=0, monthTotal=0;
+  for(let d=1;d<=days;d++){
+    plats.forEach(p=>{ if(eMap[d]?.[p.id]) monthTotal+=eMap[d][p.id]; });
+    if(rMap[d]) refTot+=rMap[d];
   }
-  if(!gridRows) gridRows=`<tr><td colspan="${plats.length+3}" style="text-align:center;padding:16px;color:var(--hint)">Нет данных</td></tr>`;
-  const gTotal=Object.values(platTots).reduce((a,b)=>a+b,0)+refTot;
-  const heads=plats.map(p=>`<th><div class="plat-header"><span class="plat-dot" style="background:${p.color}"></span>${p.name}</div></th>`).join('');
-  const foots=plats.map(p=>`<td class="td-amount">$${(platTots[p.id]||0).toFixed(0)}</td>`).join('');
+  monthTotal+=refTot;
+
+  const firstDow = (new Date(state.year, state.month-1, 1).getDay()+6)%7;
+  let calCells='';
+  for(let i=0;i<firstDow;i++) calCells+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=days;d++){
+    const dd=eMap[d]||{}; const ra=rMap[d]||0;
+    let dayTotal=0;
+    plats.forEach(p=>{ if(dd[p.id]) dayTotal+=dd[p.id]; });
+    if(ra) dayTotal+=ra;
+    const bars=plats.filter(p=>dd[p.id]).map(p=>`<div class="cal-bar" style="background:${p.color}"></div>`).join('');
+    const refDot=ra?`<div class="cal-ref-dot"></div>`:'';
+    calCells+=`<div class="cal-cell"><div class="cal-day-num">${d}</div>${dayTotal>0?`<div class="cal-amount has-data">$${dayTotal.toFixed(0)}</div>`:''}<div class="cal-bars">${bars}${refDot}</div></div>`;
+  }
+  const calLegend=plats.map(p=>`<div class="legend-item"><span class="legend-dot" style="background:${p.color}"></span>${p.name}</div>`).join('')+(refTot>0?`<div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Реф.бонус</div>`:'');
 
   page.innerHTML = `
     <div class="back-btn" id="back-to-models">← Все модели</div>
@@ -498,22 +504,25 @@ async function openModelDetail(tgId) {
       <div class="plat-assign-grid">${platCards||'<div style="color:var(--hint);font-size:13px">Нет площадок</div>'}</div>
     </div>
 
-    <div class="card" style="padding:0">
-      <div style="padding:14px 14px 8px">
-        <div class="card-title">Доходы — ${MONTHS[state.month-1]} ${state.year}</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <button class="nav-btn" id="dp">&lt;</button>
-          <span style="flex:1;text-align:center;line-height:38px;font-weight:600">${MONTHS[state.month-1]} ${state.year}</span>
-          <button class="nav-btn" id="dn">&gt;</button>
-        </div>
+    <div class="card">
+      <div class="card-title">Доходы</div>
+      <div class="earn-stats" style="margin-bottom:12px">
+        <div class="earn-stat"><div class="earn-stat-val">$${monthTotal.toFixed(0)}</div><div class="earn-stat-lbl">За месяц</div></div>
+        <div class="earn-stat"><div class="earn-stat-val" style="color:var(--gold)">$${refTot.toFixed(0)}</div><div class="earn-stat-lbl">Реф.бонус</div></div>
       </div>
-      <div class="earn-wrap">
-        <table class="earn-grid">
-          <thead><tr><th>День</th>${heads}<th>Реф.</th><th>Итого</th></tr></thead>
-          <tbody>${gridRows}</tbody>
-          <tfoot><tr class="row-total"><td>∑</td>${foots}<td class="td-ref">$${refTot.toFixed(0)}</td><td class="td-total">$${gTotal.toFixed(0)}</td></tr></tfoot>
-        </table>
+      <div class="month-nav" style="margin-bottom:10px">
+        <button class="nav-btn" id="dp">&#8249;</button>
+        <span style="font-size:15px;font-weight:700">${MONTHS[state.month-1]} ${state.year}</span>
+        <button class="nav-btn" id="dn">&#8250;</button>
       </div>
+      <div class="cal-weekdays">
+        <div class="cal-weekday">Пн</div><div class="cal-weekday">Вт</div><div class="cal-weekday">Ср</div>
+        <div class="cal-weekday">Чт</div><div class="cal-weekday">Пт</div>
+        <div class="cal-weekday" style="color:var(--btn)">Сб</div>
+        <div class="cal-weekday" style="color:var(--red)">Вс</div>
+      </div>
+      <div class="cal-grid">${calCells}</div>
+      <div class="plat-legend">${calLegend}</div>
     </div>
 
     <div class="card">
