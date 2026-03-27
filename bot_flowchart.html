@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Блок-схема бота — Own Agency</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+  h1 { text-align: center; color: #00d2ff; margin-bottom: 5px; }
+  h3 { text-align: center; color: #888; margin-top: 0; font-weight: normal; }
+  .container { max-width: 1400px; margin: 0 auto; }
+  .mermaid { background: #16213e; border-radius: 12px; padding: 20px; margin: 20px 0; }
+  .section-title { color: #00d2ff; font-size: 1.3em; margin: 30px 0 10px 0; border-bottom: 1px solid #334; padding-bottom: 5px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    primaryColor: '#1e3a5f',
+    primaryTextColor: '#fff',
+    primaryBorderColor: '#00d2ff',
+    lineColor: '#00d2ff',
+    secondaryColor: '#2d1b69',
+    tertiaryColor: '#1a3c34',
+    fontSize: '14px'
+  },
+  flowchart: { curve: 'basis', useMaxWidth: true }
+});
+</script>
+</head>
+<body>
+<div class="container">
+
+<h1>Own Agency Bot — Блок-схема</h1>
+<h3>aiogram 3 + aiosqlite</h3>
+
+<!-- ====== ОСНОВНОЙ ПОТОК ====== -->
+<div class="section-title">1. Основной поток пользователя</div>
+<div class="mermaid">
+flowchart TD
+    START["/start"] --> CHK_USER{"Пользователь\nсуществует?"}
+    CHK_USER -- Нет --> CREATE_USER["Создать пользователя\n(+ реферал ref_by)"]
+    CREATE_USER --> CHK_STATUS
+    CHK_USER -- Да --> CHK_STATUS{"Статус?"}
+
+    CHK_STATUS -- "new" --> LANG_SELECT["🌍 Выбор языка\nru / en"]
+    CHK_STATUS -- "filling" --> WELCOME_FORM["Показать приглашение\nк заполнению анкеты"]
+    CHK_STATUS -- "reviewing / approved\nrejected / active" --> MAIN_MENU["📱 Главное меню\n(ReplyKeyboard)"]
+
+    LANG_SELECT -- "callback lang:ru/en" --> SAVE_LANG["Сохранить язык"]
+    SAVE_LANG --> WELCOME_FORM
+
+    WELCOME_FORM -- "callback form:start" --> FORM_START["Начать анкету\nstatus → filling\nstep → 0"]
+
+    FORM_START --> Q["❓ Вопрос step"]
+    Q -- "Ответ текстом" --> SAVE_ANS["Сохранить в anketa\nstep += 1"]
+    SAVE_ANS --> CHK_STEP{"step < 10?"}
+    CHK_STEP -- Да --> Q
+    CHK_STEP -- Нет --> FORM_DONE["✅ Анкета заполнена\nstatus → reviewing"]
+    FORM_DONE --> NOTIFY_ADMIN["📩 Уведомить админа\no новой заявке"]
+    FORM_DONE --> MAIN_MENU
+
+    Q -- "callback form:back" --> BACK_STEP["step -= 1"] --> Q
+
+    style START fill:#0d7377,color:#fff
+    style MAIN_MENU fill:#1e6b3a,color:#fff,stroke:#2ecc71,stroke-width:2px
+    style FORM_DONE fill:#1e6b3a,color:#fff
+    style NOTIFY_ADMIN fill:#8e44ad,color:#fff
+    style LANG_SELECT fill:#2d1b69,color:#fff
+</div>
+
+<!-- ====== ГЛАВНОЕ МЕНЮ ====== -->
+<div class="section-title">2. Главное меню (ReplyKeyboard)</div>
+<div class="mermaid">
+flowchart TD
+    MENU["📱 Главное меню"]
+
+    MENU --> PROFILE["📋 Профиль"]
+    MENU --> REFERRALS["🤝 Рефералы"]
+    MENU --> EARNINGS["📊 Мои доходы"]
+    MENU --> PLATFORMS["🔗 Мои площадки"]
+    MENU --> BONUS["🎁 Получить бонус"]
+    MENU --> CHANNEL["📢 Наш канал"]
+    MENU --> LANG["🌍 Язык"]
+    MENU --> ADMIN["🔧 Админка\n(только ADMIN_CHAT_ID)"]
+
+    PROFILE --> SHOW_PROFILE["Показать анкету\n+ статус"]
+    SHOW_PROFILE --> EDIT_BTNS["✏️ Кнопки редактирования\n10 полей (InlineKeyboard)"]
+    EDIT_BTNS -- "callback edit:field" --> WAIT_INPUT["Ожидание нового значения\n(FSM EditState.waiting)"]
+    WAIT_INPUT -- "текст" --> SAVE_FIELD["Сохранить поле\nПоказать обновлённый профиль"]
+    EDIT_BTNS -- "callback edit:cancel" --> CANCEL_EDIT["Отмена редактирования"]
+
+    REFERRALS --> SHOW_REFS["Реф. ссылка\nКол-во рефералов\nБаланс\nПоследние бонусы"]
+
+    EARNINGS --> SHOW_CAL["📅 Календарь текущего месяца\nСумма по дням и площадкам\n+ сравнение с прошлым месяцем"]
+    SHOW_CAL --> NAV_CAL["◀ / ▶ навигация по месяцам\ncallback earn:cal:tg_id:year:month"]
+    NAV_CAL --> SHOW_CAL
+
+    PLATFORMS --> SHOW_PLAT["Список всех площадок\n✅ выбранные / ⬜ нет"]
+    SHOW_PLAT -- "callback plat:toggle:id" --> TOGGLE["Включить/выключить площадку\nОбновить клавиатуру"]
+    TOGGLE --> SHOW_PLAT
+
+    BONUS --> BONUS_MSG["Текст о бонусе"]
+    CHANNEL --> CHANNEL_LINK["🔗 Ссылка на канал"]
+    LANG --> LANG_KB["Выбор языка ru/en"]
+
+    style MENU fill:#1e6b3a,color:#fff,stroke:#2ecc71,stroke-width:2px
+    style ADMIN fill:#8e44ad,color:#fff,stroke:#9b59b6,stroke-width:2px
+    style EARNINGS fill:#0d7377,color:#fff
+    style PLATFORMS fill:#0d7377,color:#fff
+    style SHOW_CAL fill:#1e3a5f,color:#fff
+    style SHOW_PLAT fill:#1e3a5f,color:#fff
+</div>
+
+<!-- ====== ПЛОЩАДКИ ====== -->
+<div class="section-title">3. Площадки (platforms)</div>
+<div class="mermaid">
+flowchart LR
+    DB[("🗄️ platforms\n(справочник)")]
+
+    DB --- P1["OnlyFans\n#00AFF0"]
+    DB --- P2["Fansly\n#9B59B6"]
+    DB --- P3["BongaCams\n#E74C3C"]
+    DB --- P4["Chaturbate\n#F39C12"]
+    DB --- P5["Stripchat\n#E91E63"]
+    DB --- P6["MYM.fans\n#FF6B35"]
+
+    DB -. "model_platforms\n(связь)" .-> MP["tg_id + platform_id\naccount_url, is_active"]
+    MP -. "daily_earnings" .-> DE["tg_id + platform_id + date\namount, added_by, note"]
+
+    style DB fill:#1e3a5f,color:#fff
+    style P1 fill:#00AFF0,color:#fff
+    style P2 fill:#9B59B6,color:#fff
+    style P3 fill:#E74C3C,color:#fff
+    style P4 fill:#F39C12,color:#fff
+    style P5 fill:#E91E63,color:#fff
+    style P6 fill:#FF6B35,color:#fff
+</div>
+
+<!-- ====== АДМИН-ПАНЕЛЬ ====== -->
+<div class="section-title">4. Админ-панель</div>
+<div class="mermaid">
+flowchart TD
+    ADM["🔧 Админ-панель\n(InlineKeyboard)"]
+
+    ADM --> STATS["📊 Статистика\nКол-во по статусам"]
+    ADM --> NEW_APPS["🆕 Новые заявки\n(status=reviewing)"]
+    ADM --> ALL_MODELS["📋 Все модели"]
+    ADM --> APPROVED["✅ Одобренные"]
+    ADM --> ACTIVE["🟢 Активные"]
+    ADM --> ADM_EARN["💰 Заработок моделей"]
+    ADM --> ADD_EARN["➕ Внести заработок"]
+
+    NEW_APPS --> MODEL_LIST["Список моделей\n(пагинация по 5)"]
+    ALL_MODELS --> MODEL_LIST
+    APPROVED --> MODEL_LIST
+    ACTIVE --> MODEL_LIST
+
+    MODEL_LIST -- "callback adm:view:tg_id" --> MODEL_CARD["👤 Карточка модели\nВсе поля анкеты\nСтатус, рефералы, доход"]
+    MODEL_CARD --> SET_STATUS{"Изменить статус"}
+    SET_STATUS -- "adm:set:tg_id:approved" --> NOTIFY_M["📩 Уведомить модель\n'Вы одобрены'"]
+    SET_STATUS -- "adm:set:tg_id:rejected" --> NOTIFY_M2["📩 'Вы отклонены'"]
+    SET_STATUS -- "adm:set:tg_id:active" --> NOTIFY_M3["📩 'Вы активированы'"]
+
+    style ADM fill:#8e44ad,color:#fff,stroke:#9b59b6,stroke-width:2px
+    style ADM_EARN fill:#d4a017,color:#fff
+    style ADD_EARN fill:#d4a017,color:#fff
+    style NOTIFY_M fill:#1e6b3a,color:#fff
+    style NOTIFY_M2 fill:#c0392b,color:#fff
+    style NOTIFY_M3 fill:#1e6b3a,color:#fff
+</div>
+
+<!-- ====== FSM ВНЕСЕНИЕ ЗАРАБОТКА ====== -->
+<div class="section-title">5. FSM: Внесение заработка (админ)</div>
+<div class="mermaid">
+flowchart TD
+    START_FSM["➕ Внести заработок\ncallback adm:add_earning"] --> S1["AddEarningState.choose_model\n📋 Список активных моделей"]
+
+    S1 -- "callback admadd:model:tg_id" --> S2["AddEarningState.choose_platform\n🏷 Список площадок"]
+
+    S2 -- "callback admadd:plat:id" --> S3["AddEarningState.enter_date\n📅 Ввод даты ДД.ММ.ГГГГ\nили кнопка 'Сегодня'"]
+
+    S3 -- "текст ДД.ММ.ГГГГ" --> S4["AddEarningState.enter_amount\n💵 Ввод суммы в $"]
+    S3 -- "callback admadd:date:today" --> S4
+
+    S4 -- "текст (число)" --> SAVE["✅ upsert_earning()\nПересчитать users.income"]
+    SAVE --> CONFIRM["Подтверждение админу:\n👤 Модель | 🏷 Площадка\n📅 Дата | 💵 Сумма"]
+    SAVE --> NOTIFY["📩 Уведомить модель\nо новом заработке"]
+
+    S1 -- "callback admadd:cancel" --> CANCEL["❌ Отмена\nstate.clear()"]
+    S2 -- "callback admadd:cancel" --> CANCEL
+    S3 -- "callback admadd:cancel" --> CANCEL
+
+    style START_FSM fill:#d4a017,color:#fff
+    style S1 fill:#1e3a5f,color:#fff
+    style S2 fill:#1e3a5f,color:#fff
+    style S3 fill:#1e3a5f,color:#fff
+    style S4 fill:#1e3a5f,color:#fff
+    style SAVE fill:#1e6b3a,color:#fff
+    style NOTIFY fill:#8e44ad,color:#fff
+    style CANCEL fill:#c0392b,color:#fff
+</div>
+
+<!-- ====== АДМИН: СВОДКА ЗАРАБОТКА ====== -->
+<div class="section-title">6. Админ: Сводка заработка по месяцам</div>
+<div class="mermaid">
+flowchart TD
+    ADM_E["💰 Заработок моделей\ncallback adm:earnings:year:month"]
+
+    ADM_E --> OVERVIEW["📊 Сводная таблица\n\n💵 Итого по всем моделям\n─── По площадкам ───\n• OnlyFans: $XXX (N мод.)\n• Fansly: $XXX (N мод.)\n─── По моделям ───\n• Имя 🔗: $XXX\n• Имя: $XXX"]
+
+    OVERVIEW --> NAV["◀ / ▶ навигация по месяцам"]
+    NAV --> ADM_E
+
+    OVERVIEW --> BTN_ADD["➕ Внести заработок"]
+    OVERVIEW --> BTN_HOME["🏠 Главная"]
+
+    style ADM_E fill:#d4a017,color:#fff
+    style OVERVIEW fill:#1e3a5f,color:#fff
+    style NAV fill:#0d7377,color:#fff
+</div>
+
+<!-- ====== СХЕМА БД ====== -->
+<div class="section-title">7. Схема базы данных (SQLite)</div>
+<div class="mermaid">
+erDiagram
+    users {
+        int id PK
+        int tg_id UK
+        text tg_username
+        text language
+        int ref_by FK
+        real balance
+        real income
+        text status
+        int step
+        datetime created_at
+    }
+
+    anketa {
+        int id PK
+        int tg_id FK
+        text full_name
+        text height
+        text weight
+        text phone_model
+        text socials
+        text location
+        text limits
+        text desired_income
+        text experience
+        text goals
+    }
+
+    ref_bonuses {
+        int id PK
+        int owner_tg_id FK
+        int from_tg_id FK
+        real amount
+        datetime created_at
+    }
+
+    platforms {
+        int id PK
+        text name UK
+        text slug UK
+        text color_hex
+        int sort_order
+        int is_active
+    }
+
+    model_platforms {
+        int id PK
+        int tg_id FK
+        int platform_id FK
+        text account_url
+        int is_active
+        datetime added_at
+    }
+
+    daily_earnings {
+        int id PK
+        int tg_id FK
+        int platform_id FK
+        text date
+        real amount
+        text added_by
+        text note
+        datetime created_at
+    }
+
+    users ||--o| anketa : "tg_id"
+    users ||--o{ ref_bonuses : "owner_tg_id"
+    users ||--o{ model_platforms : "tg_id"
+    users ||--o{ daily_earnings : "tg_id"
+    platforms ||--o{ model_platforms : "platform_id"
+    platforms ||--o{ daily_earnings : "platform_id"
+</div>
+
+<!-- ====== ФАЙЛОВАЯ СТРУКТУРА ====== -->
+<div class="section-title">8. Файловая структура</div>
+<div class="mermaid">
+flowchart LR
+    BOT["bot.py\n─────────\nТочка входа\nDispatcher\nProxy"] --> |include_router| H["handlers.py\n─────────\nОсновной роутер\n/start, форма, профиль\nрефералы, админка"]
+    BOT --> |include_router| HE["handlers_earnings.py\n─────────\nEarnings роутер\nдоходы, площадки\nFSM заработка"]
+
+    H --> DB["database.py\n─────────\ninit_db, users\nanketa, referrals\nplatforms, earnings"]
+    HE --> DB
+
+    H --> KB["keyboards.py\n─────────\nReply / Inline\nmain_menu\nadmin keyboards"]
+    HE --> KB2["InlineKeyboardBuilder\n(внутри handlers_earnings)"]
+
+    H --> TR["translations.py\n─────────\nt(), ts()\nru / en"]
+
+    H --> CFG["config.py\n─────────\nBOT_TOKEN\nADMIN_CHAT_ID\nDB_PATH, PROXY"]
+    HE --> CFG
+
+    style BOT fill:#0d7377,color:#fff,stroke-width:2px
+    style H fill:#1e3a5f,color:#fff
+    style HE fill:#1e3a5f,color:#fff
+    style DB fill:#8e44ad,color:#fff
+    style KB fill:#1e6b3a,color:#fff
+    style TR fill:#d4a017,color:#fff
+    style CFG fill:#c0392b,color:#fff
+</div>
+
+</div>
+</body>
+</html>

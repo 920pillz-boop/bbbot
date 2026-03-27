@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Own Agency</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --bg:    var(--tg-theme-bg-color, #0f0f1a);
+  --bg2:   var(--tg-theme-secondary-bg-color, #1a1a2e);
+  --bg3:   #222236;
+  --text:  var(--tg-theme-text-color, #ffffff);
+  --hint:  var(--tg-theme-hint-color, #7a8899);
+  --link:  var(--tg-theme-link-color, #5ebbff);
+  --btn:   var(--tg-theme-button-color, #5ebbff);
+  --btn-t: var(--tg-theme-button-text-color, #ffffff);
+  --green: #2ecc71;
+  --red:   #e74c3c;
+  --gold:  #f1c40f;
+  --border: rgba(255,255,255,0.07);
+  --radius: 12px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+/* ── TABS ── */
+.tabs { display:flex; background:var(--bg2); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:20; }
+.tab { flex:1; padding:13px 4px; text-align:center; font-size:12px; font-weight:500; color:var(--hint); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; user-select:none; }
+.tab.active { color:var(--btn); border-bottom-color:var(--btn); }
+.tab-icon { font-size:16px; display:block; margin-bottom:2px; }
+
+/* ── PAGES ── */
+.page { display:none; padding:14px; animation:fadeIn .2s; padding-bottom:24px; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+
+/* ── CARDS ── */
+.card { background:var(--bg2); border-radius:var(--radius); padding:14px; margin-bottom:12px; }
+.card-title { font-size:11px; color:var(--hint); text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px; font-weight:600; }
+
+/* ── PROFILE ── */
+.profile-head { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.avatar { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--btn),#a855f7); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700; color:#fff; flex-shrink:0; }
+.profile-name { font-size:19px; font-weight:700; line-height:1.2; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; margin-top:5px; }
+.badge-active   { background:rgba(46,204,113,.15); color:var(--green); }
+.badge-approved { background:rgba(94,187,255,.15); color:var(--link); }
+.badge-reviewing{ background:rgba(241,196,15,.15); color:var(--gold); }
+.badge-new,.badge-filling { background:rgba(255,255,255,.06); color:var(--hint); }
+.badge-rejected { background:rgba(231,76,60,.15); color:var(--red); }
+
+.stats-row { display:flex; gap:8px; margin-bottom:4px; }
+.stat { flex:1; background:var(--bg3); border-radius:10px; padding:12px; text-align:center; }
+.stat-val { font-size:20px; font-weight:700; color:var(--btn); }
+.stat-lbl { font-size:10px; color:var(--hint); margin-top:3px; }
+
+.field-row { display:flex; justify-content:space-between; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--border); gap:8px; }
+.field-row:last-child { border-bottom:none; }
+.field-label { font-size:12px; color:var(--hint); flex-shrink:0; }
+.field-value { font-size:13px; text-align:right; word-break:break-word; max-width:65%; }
+
+/* ── EARNINGS GRID ── */
+.month-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.nav-btn { background:var(--bg2); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:10px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.month-label { font-size:16px; font-weight:700; }
+
+.earn-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.earn-grid { border-collapse:collapse; width:100%; min-width:320px; font-size:13px; }
+.earn-grid th {
+  padding:8px 10px; text-align:right; white-space:nowrap;
+  font-size:11px; font-weight:600; color:var(--hint);
+  border-bottom:2px solid var(--border); position:sticky; top:0;
+  background:var(--bg2);
+}
+.earn-grid th:first-child { text-align:left; }
+.earn-grid td { padding:7px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
+.earn-grid td:first-child { text-align:left; color:var(--hint); font-size:12px; }
+.earn-grid .td-empty { color:var(--border); }
+.earn-grid .td-amount { color:var(--text); font-weight:500; }
+.earn-grid .td-ref { color:var(--gold); font-weight:500; }
+.earn-grid .td-total { font-weight:700; color:var(--btn); }
+.earn-grid .row-total td { border-top:2px solid var(--border); border-bottom:none; font-weight:700; }
+.earn-grid .row-total td:first-child { color:var(--text); }
+
+.plat-header { display:flex; align-items:center; gap:6px; }
+.plat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+.compare-row { display:flex; gap:8px; margin-top:10px; }
+.cmp { flex:1; background:var(--bg2); border-radius:10px; padding:12px; text-align:center; }
+.cmp-val { font-size:18px; font-weight:700; }
+.cmp-lbl { font-size:10px; color:var(--hint); margin-top:2px; }
+
+/* ── ADMIN MODELS LIST ── */
+.filter-row { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+.filter-btn { padding:6px 12px; border-radius:20px; font-size:12px; font-weight:500; background:var(--bg2); border:1px solid var(--border); color:var(--hint); cursor:pointer; }
+.filter-btn.active { background:var(--btn); border-color:var(--btn); color:var(--btn-t); }
+
+.model-row { display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+.model-row:last-child { border-bottom:none; }
+.model-row:active { opacity:.7; }
+.m-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--btn),#a855f7); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; flex-shrink:0; }
+.m-info { flex:1; min-width:0; }
+.m-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.m-meta { font-size:11px; color:var(--hint); margin-top:2px; }
+.m-income { font-size:15px; font-weight:700; color:var(--green); flex-shrink:0; }
+
+/* ── ADMIN MODEL DETAIL ── */
+.back-btn { display:flex; align-items:center; gap:6px; color:var(--btn); font-size:14px; font-weight:500; cursor:pointer; margin-bottom:14px; user-select:none; }
+.back-btn:active { opacity:.7; }
+
+.plat-assign-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.plat-toggle-card { background:var(--bg3); border:2px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:all .15s; }
+.plat-toggle-card.on { border-color:var(--green); background:rgba(46,204,113,.06); }
+.plat-toggle-card:active { opacity:.7; }
+.plat-toggle-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.plat-toggle-name { font-size:13px; font-weight:500; flex:1; }
+.plat-toggle-check { font-size:14px; }
+
+/* ── FORM ── */
+.form-group { margin-bottom:12px; }
+.form-label { font-size:12px; color:var(--hint); margin-bottom:5px; font-weight:500; }
+.form-select, .form-input {
+  width:100%; padding:11px 12px; border-radius:10px;
+  border:1px solid var(--border); background:var(--bg3);
+  color:var(--text); font-size:14px; outline:none; appearance:none;
+}
+.form-select:focus, .form-input:focus { border-color:var(--btn); }
+.form-select option { background:var(--bg2); }
+
+.btn { width:100%; padding:13px; border:none; border-radius:var(--radius); font-size:14px; font-weight:700; cursor:pointer; transition:opacity .15s; letter-spacing:.3px; }
+.btn:active { opacity:.75; }
+.btn-primary { background:var(--btn); color:var(--btn-t); }
+.btn-success { background:var(--green); color:#fff; }
+
+/* ── INLINE ADD FORM ── */
+.inline-form { background:var(--bg3); border-radius:var(--radius); padding:14px; margin-top:12px; border:1px solid var(--border); }
+.inline-form-title { font-size:13px; font-weight:700; margin-bottom:12px; }
+.date-shortcuts { display:flex; gap:6px; margin-bottom:5px; }
+.date-shortcut { font-size:11px; padding:4px 10px; border-radius:20px; background:var(--bg2); border:1px solid var(--border); color:var(--hint); cursor:pointer; }
+.date-shortcut:active { opacity:.7; }
+
+/* ── MISC ── */
+.spinner { width:30px; height:30px; border:3px solid var(--border); border-top-color:var(--btn); border-radius:50%; animation:spin .6s linear infinite; margin:40px auto; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.empty { text-align:center; padding:36px 0; color:var(--hint); font-size:14px; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--green); color:#fff; padding:10px 22px; border-radius:10px; font-size:13px; font-weight:600; opacity:0; transition:opacity .25s; z-index:100; pointer-events:none; white-space:nowrap; }
+.toast.show { opacity:1; }
+.toast.err { background:var(--red); }
+.section-divider { height:1px; background:var(--border); margin:14px 0; }
+.ref-link { font-size:12px; color:var(--hint); display:inline-block; }
+</style>
+</head>
+<body>
+<div class="tabs" id="tabs"></div>
+<div class="page" id="page-profile"></div>
+<div class="page" id="page-earnings"></div>
+<div class="page" id="page-models"></div>
+<div class="page" id="page-model-detail"></div>
+<div class="page" id="page-add"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready(); tg.expand();
+
+// ─── Auth: initData OR signed URL params ───────────────────────────────────
+const AUTH = tg.initData;
+const UP = new URLSearchParams(window.location.search);
+const SIGNED = { tg_id: UP.get('tg_id'), user: UP.get('user')||'', adm: UP.get('adm')||'0', ts: UP.get('ts')||'', sig: UP.get('sig')||'' };
+const HAS_SIGNED = !!(SIGNED.tg_id && SIGNED.sig);
+
+const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const STATUS_MAP = { active:'Активна', approved:'Одобрена', reviewing:'На проверке', new:'Новая', filling:'Заполняет', rejected:'Отклонена' };
+const FIELDS = { full_name:'Имя', height:'Рост', weight:'Вес', phone_model:'Телефон', socials:'Соцсети', location:'Город', limits:'Лимиты', desired_income:'Желаемый доход', experience:'Опыт', goals:'Цели' };
+
+let state = { isAdmin:false, profile:null, year:0, month:0, adminFilter:'all', currentModelId:null };
+
+// ─── API ───────────────────────────────────────────────────────────────────
+async function api(path, opts={}) {
+  const hdrs = { 'Content-Type':'application/json', 'Bypass-Tunnel-Reminder':'true', 'X-Pinggy-No-Screen':'true' };
+  if (AUTH) hdrs['Authorization'] = AUTH;
+  if (HAS_SIGNED) { hdrs['X-TG-ID']=SIGNED.tg_id; hdrs['X-TG-User']=SIGNED.user; hdrs['X-TG-Admin']=SIGNED.adm; hdrs['X-TG-TS']=SIGNED.ts; hdrs['X-TG-Sig']=SIGNED.sig; }
+  const res = await fetch(path, { ...opts, headers:{...hdrs,...(opts.headers||{})} });
+  return res.json();
+}
+
+function toast(text, isErr=false) {
+  const el = document.getElementById('toast');
+  el.textContent = text; el.className = 'toast show' + (isErr?' err':'');
+  setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+function fmtMoney(v) { return v ? '$' + Number(v).toFixed(0) : '—'; }
+function daysInMonth(y,m) { return new Date(y,m,0).getDate(); }
+
+// ─── TABS ──────────────────────────────────────────────────────────────────
+function initTabs(isAdmin) {
+  const tabs = isAdmin
+    ? [{ id:'models', icon:'👥', label:'Модели' }, { id:'add', icon:'➕', label:'Начислить' }]
+    : [{ id:'profile', icon:'👤', label:'Профиль' }, { id:'earnings', icon:'📊', label:'Доходы' }];
+
+  const container = document.getElementById('tabs');
+  container.innerHTML = tabs.map(t =>
+    `<div class="tab" data-tab="${t.id}"><span class="tab-icon">${t.icon}</span>${t.label}</div>`
+  ).join('');
+  container.querySelectorAll('.tab').forEach(el => el.addEventListener('click', ()=>switchTab(el.dataset.tab)));
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===id));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='page-'+id));
+
+  if (id==='profile') renderProfile(state.profile);
+  if (id==='earnings') loadEarnings();
+  if (id==='models') loadModelsList();
+  if (id==='add') loadAddForm();
+}
+
+// ─── PROFILE ───────────────────────────────────────────────────────────────
+function renderProfile(data) {
+  const { user, anketa } = data;
+  const name = anketa.full_name || user.username || 'Пользователь';
+  const initial = name.charAt(0).toUpperCase();
+  const st = user.status || 'new';
+  const plats = data.platforms || [];
+
+  const fields = Object.entries(FIELDS).map(([k,lbl]) =>
+    `<div class="field-row"><span class="field-label">${lbl}</span><span class="field-value">${anketa[k]||'—'}</span></div>`
+  ).join('');
+
+  document.getElementById('page-profile').innerHTML = `
+    <div class="card">
+      <div class="profile-head">
+        <div class="avatar">${initial}</div>
+        <div>
+          <div class="profile-name">${name}</div>
+          <span class="badge badge-${st}">${STATUS_MAP[st]||st}</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val">$${Number(user.income||0).toFixed(0)}</div><div class="stat-lbl">Доход</div></div>
+        <div class="stat"><div class="stat-val">$${Number(user.balance||0).toFixed(0)}</div><div class="stat-lbl">Баланс</div></div>
+        <div class="stat"><div class="stat-val">${plats.length}</div><div class="stat-lbl">Площадок</div></div>
+      </div>
+    </div>
+    ${plats.length ? `<div class="card"><div class="card-title">Мои площадки</div>${plats.map(p=>`<span style="display:inline-block;margin:0 6px 6px 0;padding:4px 10px;border-radius:6px;font-size:12px;background:${p.color||'#555'};color:#fff">${p.name}</span>`).join('')}</div>` : ''}
+    <div class="card"><div class="card-title">Анкета</div>${fields}</div>
+  `;
+}
+
+// ─── EARNINGS GRID ─────────────────────────────────────────────────────────
+async function loadEarnings(targetId) {
+  const page = document.getElementById('page-earnings');
+  page.innerHTML = '<div class="spinner"></div>';
+
+  const tid = targetId || '';
+  const url = `/api/earnings/${state.year}/${state.month}` + (tid ? `?tg_id=${tid}` : '');
+  const data = await api(url);
+
+  // Площадки модели — берём из профиля или из entries
+  let plats = [];
+  if (!targetId && state.profile) {
+    plats = state.profile.platforms || [];
+  } else {
+    // Уникальные площадки из entries
+    const seen = {};
+    (data.entries||[]).forEach(e => {
+      if (!seen[e.platform_id]) seen[e.platform_id] = { id:e.platform_id, name:e.platform, color:e.color };
+    });
+    plats = Object.values(seen);
+  }
+
+  const days = daysInMonth(state.year, state.month);
+  const entryMap = {}; // {day: {platform_id: amount}}
+  (data.entries||[]).forEach(e => {
+    const day = parseInt(e.date.split('-')[2]);
+    if (!entryMap[day]) entryMap[day] = {};
+    entryMap[day][e.platform_id] = e.amount;
+  });
+  const refMap = {}; // {day: amount}
+  Object.entries(data.ref_bonuses||{}).forEach(([dt,amt]) => {
+    refMap[parseInt(dt.split('-')[2])] = amt;
+  });
+
+  // Колонки итогов
+  const platTotals = {};
+  plats.forEach(p => { platTotals[p.id] = 0; });
+  let refColTotal = 0;
+
+  // Строки таблицы (только дни с данными или все — показываем все)
+  let rows = '';
+  for (let d = 1; d <= days; d++) {
+    const dayData = entryMap[d] || {};
+    const refAmt = refMap[d] || 0;
+    let dayTotal = 0;
+    let hasSomething = false;
+
+    let cells = plats.map(p => {
+      const amt = dayData[p.id] || 0;
+      if (amt) { platTotals[p.id] += amt; dayTotal += amt; hasSomething = true; }
+      return amt
+        ? `<td class="td-amount">$${amt.toFixed(0)}</td>`
+        : `<td class="td-empty">—</td>`;
+    }).join('');
+
+    if (refAmt) { refColTotal += refAmt; dayTotal += refAmt; hasSomething = true; }
+    const refCell = refAmt ? `<td class="td-ref">$${refAmt.toFixed(0)}</td>` : `<td class="td-empty">—</td>`;
+
+    if (!hasSomething) continue; // пропускаем пустые дни
+
+    const dateStr = `${String(d).padStart(2,'0')}.${String(state.month).padStart(2,'0')}`;
+    rows += `<tr><td>${dateStr}</td>${cells}${refCell}<td class="td-total">$${dayTotal.toFixed(0)}</td></tr>`;
+  }
+
+  if (!rows) rows = `<tr><td colspan="${plats.length+3}" style="text-align:center;padding:20px;color:var(--hint)">Нет данных</td></tr>`;
+
+  const grandTotal = Object.values(platTotals).reduce((a,b)=>a+b,0) + refColTotal;
+
+  const headers = plats.map(p =>
+    `<th><div class="plat-header"><span class="plat-dot" style="background:${p.color}"></span>${p.name}</div></th>`
+  ).join('');
+  const footers = plats.map(p =>
+    `<td class="td-amount">$${(platTotals[p.id]||0).toFixed(0)}</td>`
+  ).join('');
+
+  const pm = state.month>1 ? state.month-1 : 12;
+  const py = state.month>1 ? state.year : state.year-1;
+  const diff = (data.total||0) - (data.prev_total||0);
+  const diffSign = diff>=0 ? '+' : '';
+  const diffColor = diff>=0 ? 'var(--green)' : 'var(--red)';
+
+  page.innerHTML = `
+    <div class="month-nav">
+      <button class="nav-btn" id="ep">&lt;</button>
+      <span class="month-label">${MONTHS[state.month-1]} ${state.year}</span>
+      <button class="nav-btn" id="en">&gt;</button>
+    </div>
+    <div class="card" style="padding:0 0 0 0">
+      <div class="earn-wrap">
+        <table class="earn-grid">
+          <thead><tr><th>Дата</th>${headers}<th>Реф.бонус</th><th>Итого</th></tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr class="row-total"><td>Итого</td>${footers}<td class="td-ref">$${refColTotal.toFixed(0)}</td><td class="td-total">$${grandTotal.toFixed(0)}</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="compare-row">
+      <div class="cmp"><div class="cmp-val">$${(data.total||0).toFixed(0)}</div><div class="cmp-lbl">Текущий</div></div>
+      <div class="cmp"><div class="cmp-val">$${(data.prev_total||0).toFixed(0)}</div><div class="cmp-lbl">Прошлый</div></div>
+      <div class="cmp"><div class="cmp-val" style="color:${diffColor}">${diffSign}$${Math.abs(diff).toFixed(0)}</div><div class="cmp-lbl">Разница</div></div>
+    </div>`;
+
+  document.getElementById('ep').onclick = () => { navMonth(-1); loadEarnings(targetId); };
+  document.getElementById('en').onclick = () => { navMonth(1); loadEarnings(targetId); };
+}
+
+function navMonth(dir) {
+  state.month += dir;
+  if (state.month<1) { state.month=12; state.year--; }
+  if (state.month>12) { state.month=1; state.year++; }
+}
+
+// ─── ADMIN: MODELS LIST ─────────────────────────────────────────────────────
+async function loadModelsList() {
+  const page = document.getElementById('page-models');
+  page.innerHTML = '<div class="spinner"></div>';
+
+  const data = await api('/api/admin/models');
+  const models = data.models || [];
+
+  const filters = [
+    { key:'all', label:'Все' },
+    { key:'active', label:'Активные' },
+    { key:'reviewing', label:'На проверке' },
+    { key:'approved', label:'Одобренные' },
+    { key:'rejected', label:'Отклонённые' },
+  ];
+
+  const renderList = (filter) => {
+    state.adminFilter = filter;
+    const filtered = filter==='all' ? models : models.filter(m=>m.status===filter);
+
+    const filterHtml = filters.map(f =>
+      `<button class="filter-btn ${state.adminFilter===f.key?'active':''}" data-f="${f.key}">${f.label}</button>`
+    ).join('');
+
+    const listHtml = filtered.length ? filtered.map(m => {
+      const initial = (m.name||'?').charAt(0).toUpperCase();
+      const platsStr = m.platforms.join(' · ') || 'Площадки не назначены';
+      return `
+        <div class="model-row" data-id="${m.tg_id}">
+          <div class="m-avatar">${initial}</div>
+          <div class="m-info">
+            <div class="m-name">${m.name}${m.has_ref?' <span style="color:var(--gold)">🔗</span>':''}</div>
+            <div class="m-meta"><span class="badge badge-${m.status}" style="padding:1px 7px;font-size:10px">${STATUS_MAP[m.status]||m.status}</span> &nbsp;${platsStr}</div>
+          </div>
+          <div class="m-income">${m.income>0 ? '$'+Number(m.income).toFixed(0) : '—'}</div>
+        </div>`;
+    }).join('') : `<div class="empty">Нет моделей</div>`;
+
+    page.innerHTML = `
+      <div class="filter-row">${filterHtml}</div>
+      <div class="card" style="padding:0 14px">${listHtml}</div>`;
+
+    page.querySelectorAll('.filter-btn').forEach(btn =>
+      btn.addEventListener('click', ()=>renderList(btn.dataset.f))
+    );
+    page.querySelectorAll('.model-row').forEach(row =>
+      row.addEventListener('click', ()=>openModelDetail(parseInt(row.dataset.id)))
+    );
+  };
+
+  renderList(state.adminFilter);
+}
+
+// ─── ADMIN: MODEL DETAIL ────────────────────────────────────────────────────
+async function openModelDetail(tgId) {
+  state.currentModelId = tgId;
+  const page = document.getElementById('page-model-detail');
+  // Показываем вкладку
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='page-model-detail'));
+  page.innerHTML = '<div class="spinner"></div>';
+
+  const [det, earData] = await Promise.all([
+    api(`/api/admin/model/${tgId}`),
+    api(`/api/earnings/${state.year}/${state.month}?tg_id=${tgId}`)
+  ]);
+
+  const u = det.user; const a = det.anketa||{};
+  const name = a.full_name || u.username || String(u.tg_id);
+  const initial = name.charAt(0).toUpperCase();
+  const st = u.status||'new';
+
+  // Анкета поля
+  const fields = Object.entries(FIELDS).map(([k,lbl]) =>
+    `<div class="field-row"><span class="field-label">${lbl}</span><span class="field-value">${a[k]||'—'}</span></div>`
+  ).join('');
+
+  // Назначение площадок
+  const platCards = (det.platforms||[]).map(p =>
+    `<div class="plat-toggle-card ${p.assigned?'on':''}" data-pid="${p.id}" data-tid="${tgId}">
+      <span class="plat-toggle-dot" style="background:${p.color}"></span>
+      <span class="plat-toggle-name">${p.name}</span>
+      <span class="plat-toggle-check">${p.assigned?'✓':''}</span>
+    </div>`
+  ).join('');
+
+  // Сетка доходов (compact)
+  const plats = det.platforms.filter(p=>p.assigned);
+  const days = daysInMonth(state.year, state.month);
+  const eMap = {};
+  (earData.entries||[]).forEach(e => {
+    const day = parseInt(e.date.split('-')[2]);
+    if (!eMap[day]) eMap[day]={};
+    eMap[day][e.platform_id] = e.amount;
+  });
+  const rMap = {};
+  Object.entries(earData.ref_bonuses||{}).forEach(([dt,amt])=>{ rMap[parseInt(dt.split('-')[2])]=amt; });
+
+  let gridRows='', platTots={}, refTot=0;
+  plats.forEach(p=>{ platTots[p.id]=0; });
+  for (let d=1;d<=days;d++) {
+    const dd=eMap[d]||{}; const ra=rMap[d]||0; let dt=0; let has=false;
+    let cells=plats.map(p=>{ const a=dd[p.id]||0; if(a){platTots[p.id]+=a;dt+=a;has=true;} return a?`<td class="td-amount">$${a.toFixed(0)}</td>`:`<td class="td-empty">—</td>`; }).join('');
+    if(ra){refTot+=ra;dt+=ra;has=true;}
+    const rc=ra?`<td class="td-ref">$${ra.toFixed(0)}</td>`:`<td class="td-empty">—</td>`;
+    if(!has) continue;
+    gridRows+=`<tr><td>${String(d).padStart(2,'0')}</td>${cells}${rc}<td class="td-total">$${dt.toFixed(0)}</td></tr>`;
+  }
+  if(!gridRows) gridRows=`<tr><td colspan="${plats.length+3}" style="text-align:center;padding:16px;color:var(--hint)">Нет данных</td></tr>`;
+  const gTotal=Object.values(platTots).reduce((a,b)=>a+b,0)+refTot;
+  const heads=plats.map(p=>`<th><div class="plat-header"><span class="plat-dot" style="background:${p.color}"></span>${p.name}</div></th>`).join('');
+  const foots=plats.map(p=>`<td class="td-amount">$${(platTots[p.id]||0).toFixed(0)}</td>`).join('');
+
+  page.innerHTML = `
+    <div class="back-btn" id="back-to-models">← Все модели</div>
+    <div class="card">
+      <div class="profile-head">
+        <div class="avatar">${initial}</div>
+        <div>
+          <div class="profile-name">${name}</div>
+          <span class="badge badge-${st}">${STATUS_MAP[st]||st}</span>
+          ${u.ref_by ? '<span class="ref-link">🔗 приглашена по реф. ссылке</span>' : ''}
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val">$${Number(u.income||0).toFixed(0)}</div><div class="stat-lbl">Доход</div></div>
+        <div class="stat"><div class="stat-val">$${Number(u.balance||0).toFixed(0)}</div><div class="stat-lbl">Баланс</div></div>
+      </div>
+    </div>
+
+    <div class="card"><div class="card-title">Анкета</div>${fields}</div>
+
+    <div class="card">
+      <div class="card-title">Площадки</div>
+      <div class="plat-assign-grid">${platCards||'<div style="color:var(--hint);font-size:13px">Нет площадок</div>'}</div>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div style="padding:14px 14px 8px">
+        <div class="card-title">Доходы — ${MONTHS[state.month-1]} ${state.year}</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="nav-btn" id="dp">&lt;</button>
+          <span style="flex:1;text-align:center;line-height:38px;font-weight:600">${MONTHS[state.month-1]} ${state.year}</span>
+          <button class="nav-btn" id="dn">&gt;</button>
+        </div>
+      </div>
+      <div class="earn-wrap">
+        <table class="earn-grid">
+          <thead><tr><th>День</th>${heads}<th>Реф.</th><th>Итого</th></tr></thead>
+          <tbody>${gridRows}</tbody>
+          <tfoot><tr class="row-total"><td>∑</td>${foots}<td class="td-ref">$${refTot.toFixed(0)}</td><td class="td-total">$${gTotal.toFixed(0)}</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Начислить доход</div>
+      <div class="form-group">
+        <div class="form-label">Площадка</div>
+        <select class="form-select" id="det-plat">
+          <option value="">Выбери площадку...</option>
+          ${(det.platforms||[]).filter(p=>p.assigned).map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Дата</div>
+        <div class="date-shortcuts">
+          <button class="date-shortcut" id="ds-today">Сегодня</button>
+          <button class="date-shortcut" id="ds-yesterday">Вчера</button>
+        </div>
+        <input type="date" class="form-input" id="det-date" value="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Сумма ($)</div>
+        <input type="number" class="form-input" id="det-amount" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <button class="btn btn-success" id="det-submit">Сохранить</button>
+    </div>`;
+
+  // Назад
+  document.getElementById('back-to-models').onclick = () => {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-models').classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='models'));
+  };
+
+  // Месяц навигация
+  document.getElementById('dp').onclick = ()=>{ navMonth(-1); openModelDetail(tgId); };
+  document.getElementById('dn').onclick = ()=>{ navMonth(1); openModelDetail(tgId); };
+
+  // Шорткаты дат
+  const today = new Date();
+  const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
+  document.getElementById('ds-today').onclick = ()=>{ document.getElementById('det-date').value = today.toISOString().split('T')[0]; };
+  document.getElementById('ds-yesterday').onclick = ()=>{ document.getElementById('det-date').value = yesterday.toISOString().split('T')[0]; };
+
+  // Назначение площадок
+  page.querySelectorAll('.plat-toggle-card').forEach(card => {
+    card.addEventListener('click', async () => {
+      const pid = parseInt(card.dataset.pid);
+      const tid = parseInt(card.dataset.tid);
+      const res = await api('/api/admin/assign-platform', { method:'POST', body:JSON.stringify({ tg_id:tid, platform_id:pid }) });
+      if (res.ok) openModelDetail(tgId);
+      else toast('Ошибка', true);
+    });
+  });
+
+  // Сохранить заработок
+  document.getElementById('det-submit').addEventListener('click', async () => {
+    const platId = document.getElementById('det-plat').value;
+    const dateV = document.getElementById('det-date').value;
+    const amount = document.getElementById('det-amount').value;
+    if (!platId || !dateV || !amount) { toast('Заполни все поля', true); return; }
+    const res = await api('/api/admin/add-earning', {
+      method:'POST', body:JSON.stringify({ tg_id:tgId, platform_id:parseInt(platId), date:dateV, amount:parseFloat(amount) })
+    });
+    if (res.ok) { toast('Сохранено!'); document.getElementById('det-amount').value=''; openModelDetail(tgId); }
+    else toast('Ошибка: '+(res.error||'?'), true);
+  });
+}
+
+// ─── ADMIN: ADD FORM (глобальная) ──────────────────────────────────────────
+async function loadAddForm() {
+  const page = document.getElementById('page-add');
+  page.innerHTML = '<div class="spinner"></div>';
+
+  const [modelsData, platsData] = await Promise.all([
+    api('/api/admin/models'),
+    api('/api/platforms')
+  ]);
+
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const ystr = yesterday.toISOString().split('T')[0];
+
+  const activeModels = (modelsData.models||[]).filter(m=>['active','approved'].includes(m.status));
+
+  page.innerHTML = `
+    <div class="card">
+      <div class="card-title">Начислить заработок</div>
+      <div class="form-group">
+        <div class="form-label">Модель</div>
+        <select class="form-select" id="ga-model">
+          <option value="">Выбери модель...</option>
+          ${activeModels.map(m=>`<option value="${m.tg_id}">${m.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Площадка</div>
+        <select class="form-select" id="ga-plat">
+          <option value="">Сначала выбери модель</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Дата</div>
+        <div class="date-shortcuts">
+          <button class="date-shortcut" id="ga-today">Сегодня</button>
+          <button class="date-shortcut" id="ga-yesterday">Вчера</button>
+        </div>
+        <input type="date" class="form-input" id="ga-date" value="${today}">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Сумма ($)</div>
+        <input type="number" class="form-input" id="ga-amount" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <button class="btn btn-success" id="ga-submit">Сохранить</button>
+    </div>`;
+
+  // При смене модели подгружаем её площадки
+  document.getElementById('ga-model').addEventListener('change', async function() {
+    const tgId = this.value;
+    if (!tgId) { document.getElementById('ga-plat').innerHTML='<option value="">Сначала выбери модель</option>'; return; }
+    const det = await api(`/api/admin/model/${tgId}`);
+    const assignedPlats = (det.platforms||[]).filter(p=>p.assigned);
+    const sel = document.getElementById('ga-plat');
+    sel.innerHTML = assignedPlats.length
+      ? '<option value="">Выбери площадку...</option>' + assignedPlats.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')
+      : '<option value="">Нет назначенных площадок</option>';
+  });
+
+  document.getElementById('ga-today').onclick = ()=>{ document.getElementById('ga-date').value=today; };
+  document.getElementById('ga-yesterday').onclick = ()=>{ document.getElementById('ga-date').value=ystr; };
+
+  document.getElementById('ga-submit').addEventListener('click', async () => {
+    const tgId = document.getElementById('ga-model').value;
+    const platId = document.getElementById('ga-plat').value;
+    const dateV = document.getElementById('ga-date').value;
+    const amount = document.getElementById('ga-amount').value;
+    if (!tgId||!platId||!dateV||!amount) { toast('Заполни все поля', true); return; }
+    const res = await api('/api/admin/add-earning', {
+      method:'POST', body:JSON.stringify({ tg_id:parseInt(tgId), platform_id:parseInt(platId), date:dateV, amount:parseFloat(amount) })
+    });
+    if (res.ok) { toast('Сохранено!'); document.getElementById('ga-amount').value=''; }
+    else toast('Ошибка: '+(res.error||'?'), true);
+  });
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+async function init() {
+  const now = new Date();
+  state.year = now.getFullYear();
+  state.month = now.getMonth()+1;
+
+  if (!AUTH && !HAS_SIGNED) {
+    document.body.innerHTML = `
+      <div style="text-align:center;padding-top:35vh">
+        <div style="font-size:42px;margin-bottom:12px">📱</div>
+        <div style="font-size:17px;font-weight:600">Откройте через Telegram</div>
+        <div style="font-size:13px;color:var(--hint);margin-top:8px">Нажмите «📱 Личный кабинет» в боте</div>
+        <div style="font-size:11px;color:var(--border);margin-top:20px">tg.platform: ${tg.platform||'?'} · v${tg.version||'?'} · initData: ${AUTH?'ok':'empty'}</div>
+      </div>`;
+    return;
+  }
+
+  try {
+    const data = await api('/api/me');
+    if (data.error) {
+      document.body.innerHTML = `<div style="text-align:center;padding-top:35vh;color:var(--red)">Ошибка: ${data.error}</div>`;
+      return;
+    }
+    state.profile = data;
+    state.isAdmin = data.is_admin;
+    initTabs(state.isAdmin);
+    if (state.isAdmin) switchTab('models');
+    else { renderProfile(data); switchTab('profile'); }
+  } catch(e) {
+    document.body.innerHTML = `<div style="text-align:center;padding-top:35vh;color:var(--red)">Ошибка загрузки:<br>${e.message}</div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
