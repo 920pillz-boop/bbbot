@@ -117,11 +117,9 @@ def admin_model_keyboard(tg_id: int, status: str, list_status: str, offset: int,
         builder.button(text=t(lang, "btn_approve"),  callback_data=f"adm:set:{tg_id}:approved")
     if status != "rejected":
         builder.button(text=t(lang, "btn_reject"),   callback_data=f"adm:set:{tg_id}:rejected")
-    if status != "active":
-        builder.button(text=t(lang, "btn_activate"), callback_data=f"adm:set:{tg_id}:active")
     builder.button(text=t(lang, "btn_back_list"),  callback_data=f"adm:list:{list_status}:{offset}")
     builder.button(text=t(lang, "btn_back_admin"), callback_data="adm:home")
-    builder.adjust(3, 1, 1)
+    builder.adjust(2, 1, 1)
     return builder.as_markup()
 
 
