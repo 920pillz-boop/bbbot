@@ -7,3 +7,20 @@ __pycache__/
 *.pyo
 .venv/
 venv/
+
+# Xray/proxy — не нужны на сервере
+xray.exe
+xray.zip
+xray_config.json
+cloudflared.exe
+wintun.dll
+geoip.dat
+geosite.dat
+xray_no_window.ps1
+xray_no_window.vbs
+run_with_vless.py
+start.py
+
+# Логи и IDE
+*.log
+.claude/
