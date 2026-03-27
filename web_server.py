@@ -18,7 +18,7 @@ from urllib.parse import unquote, urlencode
 from aiohttp import web
 
 import database as db
-from config import BOT_TOKEN, ADMIN_CHAT_ID, WEBAPP_PORT
+from config import BOT_TOKEN, ADMIN_CHAT_ID, WEBAPP_PORT, MINIAPP_URL
 
 logger = logging.getLogger(__name__)
 
@@ -66,13 +66,18 @@ def validate_init_data(init_data: str) -> dict | None:
 
 def generate_signed_url(tg_id: int, username: str = "", is_admin: bool = False) -> str:
     """Генерирует подписанную ссылку для открытия Mini App.
-    URL берётся из env динамически — работает даже после смены туннеля."""
-    webapp_url = os.environ.get("WEBAPP_URL", "https://localhost:8080")
+    Если задан MINIAPP_URL (GitHub Pages) — открывает там, передавая api= параметром.
+    Иначе открывает прямо с Railway."""
+    api_url = os.environ.get("WEBAPP_URL", "https://localhost:8080")
+    miniapp_url = os.environ.get("MINIAPP_URL", "").rstrip("/")
+    base_url = miniapp_url if miniapp_url else api_url
     ts = str(int(time.time()))
     data = f"{tg_id}:{username}:{1 if is_admin else 0}:{ts}"
     sig = hmac.new(BOT_TOKEN.encode(), data.encode(), hashlib.sha256).hexdigest()[:32]
-    params = urlencode({"tg_id": tg_id, "user": username, "adm": 1 if is_admin else 0, "ts": ts, "sig": sig})
-    return f"{webapp_url}/?{params}"
+    params = {"tg_id": tg_id, "user": username, "adm": 1 if is_admin else 0, "ts": ts, "sig": sig}
+    if miniapp_url:
+        params["api"] = api_url  # HTML на GitHub Pages делает запросы на Railway
+    return f"{base_url}/?{urlencode(params)}"
 
 
 def validate_signed_url(tg_id: int, username: str, adm: int, ts: str, sig: str) -> bool:
