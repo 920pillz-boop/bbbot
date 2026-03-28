@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWN AGENCY — Модельный скаут / Model Scout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a1a;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#00aaff;border-radius:2px}
+a{text-decoration:none;color:inherit}
+:root{
+  --blue:#00AAFF;--blue2:#0077DD;--blue3:#0055BB;
+  --bg:linear-gradient(135deg,#00AAFF,#0077DD);
+  --gray:#F5F7FA;--gray2:#E8EDF3;--gray3:#DDE3EC;
+  --text:#1A1A2E;--text2:#4A5568;--text3:#718096;
+  --r:16px;--rsm:10px;
+  --sh:0 4px 24px rgba(0,100,200,.08);
+  --shl:0 16px 56px rgba(0,100,200,.16);
+  --shb:0 8px 32px rgba(0,150,255,.35)
+}
+.container{max-width:1100px;margin:0 auto;padding:0 32px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,170,255,.4)}50%{box-shadow:0 0 0 12px rgba(0,170,255,0)}}
+@keyframes gradFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.rv{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv.vs{opacity:1;transform:none}
+.rv:nth-child(2){transition-delay:.08s}.rv:nth-child(3){transition-delay:.16s}
+.rv:nth-child(4){transition-delay:.24s}.rv:nth-child(5){transition-delay:.32s}
+
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--gray2);padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--text);letter-spacing:-.02em}
+.nav-dot{width:13px;height:13px;border-radius:50%;background:var(--bg);animation:pulse 2.5s infinite}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-soc{display:flex;gap:6px}
+.nsb{width:32px;height:32px;border-radius:50%;background:var(--gray);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;transition:all .25s;color:var(--text2);font-weight:700}
+.nsb:hover{background:var(--blue);color:#fff;transform:scale(1.12);box-shadow:var(--shb)}
+.bcn{background:var(--bg);color:#fff;border:none;padding:9px 22px;border-radius:50px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .25s;white-space:nowrap;letter-spacing:-.01em}
+.bcn:hover{box-shadow:var(--shb);transform:translateY(-2px)}
+.lang-btn{font-size:.82rem;color:var(--text3);font-weight:600;padding:5px 12px;transition:all .2s;cursor:pointer;background:none;border:1.5px solid var(--gray3);border-radius:50px;white-space:nowrap}
+.lang-btn:hover{color:var(--blue);border-color:var(--blue)}
+.back-link{font-size:.875rem;color:var(--text2);font-weight:500;transition:color .2s;display:flex;align-items:center;gap:6px}
+.back-link:hover{color:var(--blue)}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+
+.vac-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#0a1628 0%,#0d2137 30%,#0a3a5c 60%,#064a6e 100%);padding:72px 0 64px}
+.vac-hero::before{content:'';position:absolute;top:-120px;right:-120px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,170,255,.15) 0%,transparent 70%);pointer-events:none}
+.vac-hero::after{content:'';position:absolute;bottom:-80px;left:-80px;width:350px;height:350px;background:radial-gradient(circle,rgba(0,119,221,.1) 0%,transparent 70%);pointer-events:none}
+.vac-hero-inner{position:relative;z-index:1}
+.vac-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,170,255,.15);border:1px solid rgba(0,170,255,.3);border-radius:50px;padding:6px 16px;font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:20px;backdrop-filter:blur(4px)}
+.vac-badge-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);animation:pulse 2s infinite}
+.vac-hero h1{font-size:clamp(2rem,4vw,3.2rem);font-weight:900;color:#fff;line-height:1.15;margin-bottom:16px;letter-spacing:-.03em}
+.vac-hero h1 span{color:var(--blue)}
+.vac-salary{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1.5px solid rgba(0,170,255,.4);border-radius:14px;padding:14px 24px;margin-bottom:24px;backdrop-filter:blur(6px)}
+.vac-salary-amount{font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.vac-salary-period{font-size:.82rem;color:rgba(255,255,255,.6);font-weight:500}
+.vac-hero-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.vac-tag{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 16px;font-size:.82rem;color:rgba(255,255,255,.8);font-weight:500;display:flex;align-items:center;gap:7px}
+.vac-tag-ico{font-size:1rem}
+
+.vac-content{padding:64px 0 80px}
+.vac-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.vac-card{background:var(--gray);border-radius:var(--r);padding:32px 28px;transition:all .35s;position:relative;overflow:hidden}
+.vac-card::before{content:'';position:absolute;inset:0;background:var(--bg);opacity:0;transition:opacity .35s}
+.vac-card:hover{transform:translateY(-4px);box-shadow:var(--shl)}
+.vac-card:hover::before{opacity:.03}
+.vac-card-ico{width:48px;height:48px;background:rgba(0,170,255,.1);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:18px;position:relative;z-index:1;transition:all .35s}
+.vac-card:hover .vac-card-ico{background:var(--bg);box-shadow:var(--shb)}
+.vac-card:hover .vac-card-ico span{filter:brightness(10)}
+.vac-card h3{font-size:1.05rem;font-weight:700;margin-bottom:14px;letter-spacing:-.01em;position:relative;z-index:1}
+.vac-card ul{list-style:none;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.vac-card li{display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:var(--text2);line-height:1.6}
+.vac-card li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:8px}
+.vac-card-full{grid-column:1/-1}
+
+.vac-cta{padding:0 0 88px}
+.vac-cta-box{background:var(--bg);border-radius:24px;padding:52px;text-align:center;position:relative;overflow:hidden;box-shadow:0 24px 80px rgba(0,100,255,.2)}
+.vac-cta-box::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%);pointer-events:none}
+.vac-cta-box h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:-.03em;position:relative;z-index:1}
+.vac-cta-box p{color:rgba(255,255,255,.85);margin-bottom:32px;font-size:.95rem;position:relative;z-index:1}
+.vac-cta-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--blue);padding:16px 38px;border-radius:50px;font-weight:800;font-size:1rem;transition:all .3s;border:none;cursor:pointer;letter-spacing:-.01em;box-shadow:0 8px 28px rgba(0,0,0,.15);position:relative;z-index:1}
+.vac-cta-btn:hover{box-shadow:0 16px 48px rgba(0,0,0,.25);transform:translateY(-3px)}
+
+footer{background:#fff;padding:48px 0 24px;border-top:1px solid var(--gray2)}
+.footer-simple{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:32px}
+.flogo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:1.1rem;letter-spacing:-.02em}
+.flogo-desc{font-size:.82rem;color:var(--text3);line-height:1.75;max-width:360px;margin-top:8px}
+.fsoc-row{display:flex;gap:9px}
+.fsoc-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .25s;cursor:pointer;font-weight:800}
+.fsoc-btn.tt{background:#000;color:#fff}
+.fsoc-btn.tg{background:#2AABEE;color:#fff}
+.fsoc-btn.ig{background:linear-gradient(45deg,#f09433,#dc2743);color:#fff}
+.fsoc-btn:hover{transform:scale(1.12);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.fbottom{border-top:1px solid var(--gray2);padding-top:22px;text-align:center;font-size:.8rem;color:var(--text3)}
+
+@media(max-width:960px){
+  .vac-grid{grid-template-columns:1fr}
+  .vac-card-full{grid-column:auto}
+  .lang-btn{display:none}
+  .hamburger{display:flex}
+}
+@media(max-width:600px){
+  .vac-hero{padding:48px 0 40px}
+  .vac-salary-amount{font-size:1.2rem}
+  .footer-simple{flex-direction:column;align-items:flex-start}
+  .vac-cta-box{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="own agency-clone_1.html" class="nav-logo">
+    <div class="nav-dot"></div>
+    OWN AGENCY
+  </a>
+  <div class="nav-right">
+    <a href="own agency-clone_1.html" class="back-link" data-ru="&larr; На главную" data-en="&larr; Back to main">&larr; На главную</a>
+    <button class="lang-btn" id="langToggle" onclick="toggleLang()">English</button>
+    <div class="nav-soc">
+      <button class="nsb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.78 1.53V6.84a4.84 4.84 0 0 1-1.02-.15z"/></svg></button>
+      <button class="nsb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></button>
+      <button class="nsb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></button>
+    </div>
+    <a href="https://t.me/ownagency_bot" target="_blank" class="bcn" style="text-decoration:none" data-ru="Оставить заявку" data-en="Apply now">Оставить заявку</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="vac-hero">
+  <div class="container">
+    <div class="vac-hero-inner" style="animation:fadeUp .9s ease both">
+      <div class="vac-badge"><div class="vac-badge-dot"></div><span data-ru="Открытая вакансия" data-en="Open position">Открытая вакансия</span></div>
+      <h1 data-ru="Модельный <span>скаут</span>" data-en="Model <span>Scout</span>">Модельный <span>скаут</span></h1>
+      <div class="vac-salary">
+        <div>
+          <div class="vac-salary-amount">20 000 – 400 000 &#8381;/<span data-ru="мес" data-en="mo">мес</span></div>
+          <div class="vac-salary-period" data-ru="на руки" data-en="net pay">на руки</div>
+        </div>
+      </div>
+      <div class="vac-hero-tags" style="animation:fadeUp .9s .15s ease both">
+        <div class="vac-tag"><span class="vac-tag-ico">&#128197;</span><span data-ru="Гибкий график" data-en="Flexible schedule">Гибкий график</span></div>
+        <div class="vac-tag"><span class="vac-tag-ico">&#127968;</span><span data-ru="Удалённая работа" data-en="Remote work">Удалённая работа</span></div>
+        <div class="vac-tag"><span class="vac-tag-ico">&#128176;</span><span data-ru="Еженедельные выплаты" data-en="Weekly payments">Еженедельные выплаты</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<section class="vac-content">
+  <div class="container">
+    <div class="vac-grid">
+
+      <div class="vac-card rv">
+        <div class="vac-card-ico"><span>&#128176;</span></div>
+        <h3 data-ru="Оплата" data-en="Compensation">Оплата</h3>
+        <ul>
+          <li data-ru="Сдельная и договорная — за каждую приведённую модель" data-en="Per-model and negotiable — for each recruited model">Сдельная и договорная — за каждую приведённую модель</li>
+          <li data-ru="20 000 &#8381; за рекрут; доп. вознаграждение при закрытии на $1 000" data-en="20,000 &#8381; per recruit; additional reward when closing at $1,000">20 000 &#8381; за рекрут; доп. вознаграждение при закрытии на $1 000</li>
+          <li data-ru="Выплаты: еженедельно" data-en="Payments: weekly">Выплаты: еженедельно</li>
+          <li data-ru="Чем больше активных моделей — тем выше доход" data-en="The more active models — the higher the income">Чем больше активных моделей — тем выше доход</li>
+        </ul>
+      </div>
+
+      <div class="vac-card rv">
+        <div class="vac-card-ico"><span>&#9989;</span></div>
+        <h3 data-ru="Требования" data-en="Requirements">Требования</h3>
+        <ul>
+          <li data-ru="Знание английского не требуется" data-en="English not required">Знание английского не требуется</li>
+          <li data-ru="Опыт не нужен" data-en="No experience needed">Опыт не нужен</li>
+          <li data-ru="Умение находить и привлекать девушек, соответствующих критериям агентства" data-en="Ability to find and attract girls meeting agency criteria">Умение находить и привлекать девушек, соответствующих критериям агентства</li>
+        </ul>
+      </div>
+
+      <div class="vac-card vac-card-full rv">
+        <div class="vac-card-ico"><span>&#128269;</span></div>
+        <h3 data-ru="Критерии рекрутинга" data-en="Recruitment criteria">Критерии рекрутинга</h3>
+        <ul>
+          <li data-ru="Возраст моделей: 18-35 лет" data-en="Model age: 18-35 years">Возраст моделей: 18-35 лет</li>
+          <li data-ru="Предпочтение: без опыта на Fansly/OnlyFans" data-en="Preference: no Fansly/OnlyFans experience">Предпочтение: без опыта на Fansly/OnlyFans</li>
+          <li data-ru="Готовность начать с нуля" data-en="Readiness to start from scratch">Готовность начать с нуля</li>
+        </ul>
+      </div>
+
+      <div class="vac-card vac-card-full rv">
+        <div class="vac-card-ico"><span>&#128197;</span></div>
+        <h3 data-ru="График и формат" data-en="Schedule & format">График и формат</h3>
+        <ul>
+          <li data-ru="Гибкий график" data-en="Flexible schedule">Гибкий график</li>
+          <li data-ru="Удалённая работа" data-en="Remote work">Удалённая работа</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="vac-cta">
+  <div class="container">
+    <div class="vac-cta-box">
+      <h2 data-ru="Готов начать зарабатывать?" data-en="Ready to start earning?">Готов начать зарабатывать?</h2>
+      <p data-ru="Отправь заявку через Telegram-бот и наш менеджер свяжется с тобой" data-en="Send your application via the Telegram bot and our manager will contact you">Отправь заявку через Telegram-бот и наш менеджер свяжется с тобой</p>
+      <a href="https://t.me/ownagency_bot" target="_blank" class="vac-cta-btn" style="text-decoration:none" data-ru="<svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor'><path d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/></svg> Откликнуться" data-en="<svg width='14' height='14' viewBox='0 0 24 24' fill='currentColor'><path d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/></svg> Apply"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg> Откликнуться</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-simple">
+      <div>
+        <div class="flogo"><div class="nav-dot"></div>OWN AGENCY</div>
+        <p class="flogo-desc" data-ru="OWN AGENCY Agency — помогаем контент-креаторам достигать финансовой независимости, выводя их аккаунты в топ." data-en="OWN AGENCY Agency — helping content creators achieve financial independence by bringing their accounts to the top.">OWN AGENCY Agency — помогаем контент-креаторам достигать финансовой независимости, выводя их аккаунты в топ.</p>
+      </div>
+      <div class="fsoc-row">
+        <div class="fsoc-btn tt"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.78 1.53V6.84a4.84 4.84 0 0 1-1.02-.15z"/></svg></div>
+        <div class="fsoc-btn tg"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div>
+        <div class="fsoc-btn ig"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></div>
+      </div>
+    </div>
+    <div class="fbottom" data-ru="&copy;2026 OWN AGENCY Agency. OnlyFans &amp; Fansly Агентство для моделей и креаторов" data-en="&copy;2026 OWN AGENCY Agency. OnlyFans &amp; Fansly Agency for models and creators">&copy;2026 OWN AGENCY Agency. OnlyFans &amp; Fansly Агентство для моделей и креаторов</div>
+  </div>
+</footer>
+
+<script>
+let currentLang = localStorage.getItem('own agency-lang') || 'ru';
+
+function switchLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('own agency-lang', lang);
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    const text = el.getAttribute('data-' + lang);
+    if (text !== null) el.innerHTML = text;
+  });
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.textContent = lang === 'ru' ? 'English' : 'Русский';
+  document.documentElement.lang = lang;
+}
+
+function toggleLang() {
+  switchLang(currentLang === 'ru' ? 'en' : 'ru');
+}
+
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vs'); });
+}, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+document.querySelectorAll('.rv').forEach(el => ro.observe(el));
+
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+if (currentLang !== 'ru') switchLang(currentLang);
+</script>
+</body>
+</html>

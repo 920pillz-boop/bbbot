@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWN AGENCY — OnlyFans Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a1a;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#00aaff;border-radius:2px}
+a{text-decoration:none;color:inherit}
+:root{
+  --blue:#00AAFF;--blue2:#0077DD;--blue3:#0055BB;
+  --bg:linear-gradient(135deg,#00AAFF,#0077DD);
+  --gray:#F5F7FA;--gray2:#E8EDF3;--gray3:#DDE3EC;
+  --text:#1A1A2E;--text2:#4A5568;--text3:#718096;
+  --r:16px;--rsm:10px;
+  --sh:0 4px 24px rgba(0,100,200,.08);
+  --shl:0 16px 56px rgba(0,100,200,.16);
+  --shb:0 8px 32px rgba(0,150,255,.35)
+}
+.container{max-width:1100px;margin:0 auto;padding:0 32px}
+section{padding:88px 0}
+
+/* -- ANIMATIONS -- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,170,255,.4)}50%{box-shadow:0 0 0 12px rgba(0,170,255,0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes gradFlow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes typing{0%,100%{width:0}50%{width:100%}}
+@keyframes blink{50%{opacity:0}}
+
+.rv{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv.vs{opacity:1;transform:none}
+.rv-l{opacity:0;transform:translateX(-32px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv-l.vs{opacity:1;transform:none}
+.rv-r{opacity:0;transform:translateX(32px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv-r.vs{opacity:1;transform:none}
+.rv-s{opacity:0;transform:scale(.94);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.rv-s.vs{opacity:1;transform:none}
+.rv:nth-child(2){transition-delay:.08s}.rv:nth-child(3){transition-delay:.16s}
+.rv:nth-child(4){transition-delay:.24s}.rv:nth-child(5){transition-delay:.32s}
+.rv:nth-child(6){transition-delay:.4s}
+
+/* -- NAV -- */
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--gray2);padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--text);letter-spacing:-.02em}
+.nav-dot{width:13px;height:13px;border-radius:50%;background:var(--bg);animation:pulse 2.5s infinite}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{font-size:.875rem;color:var(--text2);font-weight:500;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--bg);border-radius:1px;transition:width .25s}
+.nav-links a:hover{color:var(--blue)}.nav-links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-soc{display:flex;gap:6px}
+.nsb{width:32px;height:32px;border-radius:50%;background:var(--gray);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;transition:all .25s;color:var(--text2);font-weight:700}
+.nsb:hover{background:var(--blue);color:#fff;transform:scale(1.12);box-shadow:var(--shb)}
+.bcn{background:var(--bg);color:#fff;border:none;padding:9px 22px;border-radius:50px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .25s;white-space:nowrap;letter-spacing:-.01em}
+.bcn:hover{box-shadow:var(--shb);transform:translateY(-2px)}
+.lang-btn{font-size:.82rem;color:var(--text3);font-weight:600;padding:5px 12px;transition:all .2s;cursor:pointer;background:none;border:1.5px solid var(--gray3);border-radius:50px;white-space:nowrap}
+.lang-btn:hover{color:var(--blue);border-color:var(--blue)}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+
+/* -- HERO -- */
+.hero-wrap{position:relative;overflow:hidden;min-height:calc(100vh - 62px)}
+.hero-img{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1600&q=80&fit=crop') center top/cover no-repeat;transform:scale(1.05);transition:transform 8s ease-out}
+.hero-img.loaded{transform:scale(1)}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.55) 50%,rgba(0,0,0,.15) 100%)}
+.hero-inner{position:relative;z-index:1;padding:80px 0 72px}
+.hero-inner h1{font-size:clamp(2.2rem,4.5vw,3.8rem);font-weight:900;color:#fff;line-height:1.1;margin-bottom:22px;letter-spacing:-.03em}
+.hero-inner h1 .typed-wrap{display:block}
+.highlight{display:inline-block;background:rgba(255,255,255,.1);border:2px solid rgba(0,170,255,.6);border-radius:14px;padding:5px 18px;color:var(--blue);backdrop-filter:blur(4px);transition:all .3s}
+.hero-desc{font-size:1rem;color:rgba(255,255,255,.82);margin-bottom:28px;max-width:500px;line-height:1.75}
+.hero-feats{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;margin-bottom:36px;max-width:420px}
+.hf{display:flex;align-items:center;gap:9px;color:rgba(255,255,255,.88);font-size:.88rem;font-weight:500}
+.hf-ico{width:28px;height:28px;background:rgba(0,170,255,.2);border:1px solid rgba(0,170,255,.4);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.hero-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--text);padding:15px 30px;border-radius:50px;font-weight:700;font-size:.95rem;transition:all .3s;border:none;cursor:pointer;letter-spacing:-.01em}
+.hero-btn:hover{box-shadow:0 12px 36px rgba(0,0,0,.28);transform:translateY(-3px)}
+.tg-ico{width:28px;height:28px;background:linear-gradient(135deg,#00AAFF,#0077DD);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;flex-shrink:0}
+
+/* -- PLATFORMS -- */
+.platforms{padding:22px 0;border-bottom:1px solid var(--gray2);overflow:hidden}
+.plat-track{display:flex;gap:56px;align-items:center;width:max-content;animation:marquee 20s linear infinite;will-change:transform}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.plat-item{font-weight:800;font-size:1rem;white-space:nowrap;letter-spacing:-.01em;opacity:.55;transition:opacity .3s;cursor:default;flex-shrink:0}
+.plat-item:hover{opacity:.9}
+.plat-item.of{color:#00ADE8}.plat-item.rd{color:#FF4500}.plat-item.ph{color:#FF9000}.plat-item.yt{color:#FF0000}.plat-item.tt{color:#000}
+
+/* -- COUNTER STRIP -- */
+.counter-strip{background:var(--blue);padding:36px 0;overflow:hidden}
+.counter-strip-inner{display:grid;grid-template-columns:repeat(2,1fr);gap:0;position:relative}
+.counter-strip-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.06) 0%,transparent 100%)}
+.counter-item{text-align:center;padding:0 20px;border-right:1px solid rgba(255,255,255,.2)}
+.counter-item:last-child{border:none}
+.counter-num{font-size:clamp(2rem,4vw,2.8rem);font-weight:900;color:#fff;letter-spacing:-.04em;display:block;line-height:1;transition:opacity .4s ease, transform .4s ease}
+.counter-lbl{font-size:.82rem;color:rgba(255,255,255,.78);margin-top:6px;font-weight:500}
+
+/* -- CALCULATOR -- */
+.calc-section{background:#fff}
+.calc-title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;margin-bottom:8px;letter-spacing:-.03em}
+.calc-title span{color:var(--blue)}
+.calc-sub{color:var(--text2);margin-bottom:44px;font-size:.97rem}
+.calc-box{background:var(--gray);border-radius:20px;padding:40px;position:relative;overflow:hidden}
+.calc-box::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,170,255,.08) 0%,transparent 70%)}
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px}
+.calc-field label{display:block;font-size:.74rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}
+.cinput{width:100%;background:#fff;border:1.5px solid var(--gray3);border-radius:var(--rsm);padding:13px 15px;font-size:1rem;font-family:'Inter',sans-serif;color:var(--text);outline:none;transition:border .2s,box-shadow .2s}
+.cinput:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,170,255,.1)}
+.cinput-lbl{font-size:.73rem;color:var(--text3);margin-bottom:4px;padding:0 2px}
+.slider-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--text3);margin-bottom:8px}
+.cslider{-webkit-appearance:none;appearance:none;width:100%;height:5px;background:var(--gray3);border-radius:3px;outline:none;cursor:pointer}
+.cslider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--bg);cursor:pointer;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,150,255,.4);transition:transform .2s}
+.cslider::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.cslider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #fff}
+.slval{font-size:.8rem;color:var(--blue);margin-top:7px;font-weight:700}
+.eng-btns{display:flex;gap:4px;margin-top:2px}
+.eng-btn{flex:1;padding:8px 0;background:#fff;border:1.5px solid var(--gray3);border-radius:7px;font-size:.78rem;font-weight:600;color:var(--text3);cursor:pointer;transition:all .2s;text-align:center}
+.eng-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(0,150,255,.3)}
+.calc-result-row{background:#fff;border-radius:14px;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;box-shadow:var(--sh)}
+.calc-result-label{font-size:.95rem;color:var(--text2);font-weight:500}
+.calc-result-amount{background:var(--bg);color:#fff;border-radius:50px;padding:14px 48px;font-size:2rem;font-weight:900;letter-spacing:-.04em;box-shadow:var(--shb);transition:all .3s;min-width:200px;text-align:center}
+.calc-note{font-size:.74rem;color:var(--text3);margin-top:14px;font-style:italic;text-align:center}
+
+/* -- PROBLEMS -- */
+.prob-section{background:var(--gray)}
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.prob-left h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:14px;letter-spacing:-.03em}
+.prob-left h2 span{color:var(--blue)}
+.prob-left p{color:var(--text2);margin-bottom:36px;line-height:1.75;font-size:.97rem}
+.prob-list{display:flex;flex-direction:column;gap:12px}
+.prob-item{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:all .3s}
+.prob-item:hover{box-shadow:var(--sh);transform:translateX(4px)}
+.prob-ico{width:34px;height:34px;background:linear-gradient(135deg,rgba(0,170,255,.1),rgba(0,100,220,.1));border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;flex-shrink:0;color:var(--blue)}
+.prob-text{font-size:.9rem;color:var(--text2);font-weight:500}
+.prob-img{border-radius:20px;overflow:hidden;position:relative;box-shadow:var(--shl)}
+.prob-img img{width:100%;height:440px;object-fit:cover;display:block;transition:transform .6s ease}
+.prob-img:hover img{transform:scale(1.04)}
+
+/* -- SERVICES -- */
+.srv-section{background:#fff}
+.srv-intro{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:flex-start;margin-bottom:52px}
+.srv-intro h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;letter-spacing:-.03em}
+.srv-intro h2 span{color:var(--blue)}
+.srv-intro p{color:var(--text2);line-height:1.75;font-size:.97rem}
+.srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.srv-card{background:var(--gray);border-radius:var(--r);padding:26px 22px;transition:all .35s;position:relative;overflow:hidden;cursor:default}
+.srv-card::before{content:'';position:absolute;inset:0;background:var(--bg);opacity:0;transition:opacity .35s}
+.srv-card:hover{transform:translateY(-6px);box-shadow:var(--shl)}
+.srv-card:hover::before{opacity:.04}
+.srv-card:hover .srv-ico{background:var(--bg);color:#fff;box-shadow:var(--shb)}
+.srv-ico{width:46px;height:46px;background:rgba(0,170,255,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin-bottom:16px;transition:all .35s}
+.srv-card h3{font-size:.97rem;font-weight:700;margin-bottom:9px;letter-spacing:-.01em}
+.srv-card p{font-size:.85rem;color:var(--text2);line-height:1.65}
+.srv-cta-card{background:var(--bg);color:#fff;box-shadow:var(--shb)}
+.srv-cta-card .srv-ico{background:rgba(255,255,255,.2);color:#fff}
+.srv-cta-card h3{color:#fff}.srv-cta-card p{color:rgba(255,255,255,.82)}
+
+/* -- PROCESS -- */
+.proc-section{background:var(--gray)}
+.proc-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.proc-left h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:14px;letter-spacing:-.03em}
+.proc-left h2 .blue{color:var(--blue)}
+.proc-left>p{color:var(--text2);line-height:1.75;margin-bottom:32px;font-size:.97rem}
+.proc-steps{display:flex;flex-direction:column;gap:0}
+.proc-step{display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid var(--gray3);cursor:pointer;transition:all .2s;border-radius:10px;padding-left:8px;margin-left:-8px}
+.proc-step:last-child{border-bottom:none}
+.proc-step:hover{background:rgba(0,170,255,.04)}
+.proc-num{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;flex-shrink:0;margin-top:1px;transition:all .3s}
+.proc-num.active{background:var(--bg);color:#fff;box-shadow:0 4px 12px rgba(0,150,255,.35)}
+.proc-num.inactive{background:var(--gray3);color:var(--text3)}
+.proc-step-text{font-size:.9rem;color:var(--text2);line-height:1.55;padding-top:7px;transition:color .3s}
+.proc-step.active-step .proc-step-text{color:var(--text);font-weight:600}
+.proc-phone{position:relative;width:260px;margin:0 auto}
+.proc-phone-img{border-radius:32px;overflow:hidden;box-shadow:0 40px 80px rgba(0,100,255,.22);position:relative;z-index:1}
+.proc-phone-img img{width:100%;height:520px;object-fit:cover;display:block}
+.proc-phone-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(0,170,255,.18) 0%,transparent 70%);z-index:0;animation:float 5s ease-in-out infinite}
+
+/* -- COMPARISON -- */
+.cmp-section{background:#fff}
+.cmp-section h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:10px;letter-spacing:-.03em}
+.cmp-section h2 .blue{color:var(--blue)}
+.cmp-sub{color:var(--text2);margin-bottom:36px;font-size:.97rem}
+.cmp-table{border:1.5px solid var(--gray2);border-radius:20px;overflow:hidden;box-shadow:var(--sh)}
+.cmp-head{display:grid;grid-template-columns:1fr 1fr;background:var(--bg)}
+.cmp-hc{padding:18px 28px;font-weight:700;font-size:1rem;color:#fff;text-align:center;letter-spacing:-.01em}
+.cmp-hc:last-child{background:rgba(255,255,255,.12)}
+.cmp-row{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--gray2);transition:background .2s}
+.cmp-row:hover{background:rgba(0,170,255,.03)}
+.cmp-cell{padding:18px 28px;display:flex;align-items:flex-start;gap:12px;font-size:.875rem;line-height:1.55}
+.cmp-cell:last-child{border-left:1px solid var(--gray2);color:var(--text3)}
+.ok{color:#16C784;font-size:1.1rem;flex-shrink:0;margin-top:1px;font-weight:900}
+.nx{color:#FF4444;font-size:1.1rem;flex-shrink:0;margin-top:1px;font-weight:900}
+.cmp-footer{padding:28px;background:var(--gray);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px}
+.cmp-footer-text{font-size:.9rem;color:var(--text2);max-width:580px;line-height:1.7}
+.cmp-footer-text ul{margin-top:12px;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.cmp-footer-text li{color:var(--blue);font-weight:500}
+
+/* -- RESULTS -- */
+.res-section{background:var(--gray)}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.res-left h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:16px;letter-spacing:-.03em}
+.res-left h2 .blue{color:var(--blue)}
+.res-left>p{color:var(--text2);margin-bottom:20px;line-height:1.75}
+.res-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.res-item{display:flex;align-items:flex-start;gap:10px;font-size:.9rem;color:var(--text2);line-height:1.55}
+.res-dot{color:var(--blue);font-size:1.3rem;flex-shrink:0;margin-top:-3px}
+.res-img{border-radius:20px;overflow:hidden;box-shadow:var(--shl);position:relative}
+.res-img img{width:100%;height:400px;object-fit:cover;display:block;transition:transform .6s ease}
+.res-img:hover img{transform:scale(1.04)}
+
+/* -- PLAN -- */
+.plan-section{background:#fff}
+.plan-section h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:40px;letter-spacing:-.03em}
+.plan-section h2 .blue{color:var(--blue)}
+.plan-card{border-radius:24px;overflow:hidden;background:var(--gray);display:grid;grid-template-columns:1fr 1fr;box-shadow:var(--sh);transition:box-shadow .3s}
+.plan-card:hover{box-shadow:var(--shl)}
+.plan-left{padding:44px}
+.plan-left h3{font-size:1.55rem;font-weight:800;margin-bottom:16px;line-height:1.3;letter-spacing:-.03em}
+.plan-left h3 .blue{color:var(--blue)}
+.plan-left p{color:var(--text2);line-height:1.75;margin-bottom:16px;font-size:.93rem}
+.plan-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:32px}
+.plan-list li{display:flex;align-items:center;gap:9px;font-size:.88rem;color:var(--text2)}
+.plan-dot{color:var(--blue);font-size:1.3rem;flex-shrink:0;margin-top:-2px}
+.plan-img{position:relative;overflow:hidden}
+.plan-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease}
+.plan-card:hover .plan-img img{transform:scale(1.06)}
+
+/* -- FAQ -- */
+.faq-section{background:var(--gray)}
+.faq-section h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:10px;letter-spacing:-.03em}
+.faq-section h2 .blue{color:var(--blue)}
+.faq-sub{color:var(--text2);margin-bottom:40px;line-height:1.7}
+.faq-list{display:flex;flex-direction:column;gap:10px}
+.faq-item{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s}
+.faq-item.open{box-shadow:0 6px 24px rgba(0,100,255,.1)}
+.fq{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:16px;user-select:none}
+.fq span{font-size:.95rem;font-weight:700;color:var(--blue);line-height:1.4;letter-spacing:-.01em}
+.ftog{width:34px;height:34px;border-radius:50%;background:var(--bg);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;font-weight:800;transition:transform .35s cubic-bezier(.16,1,.3,1);box-shadow:0 4px 12px rgba(0,150,255,.3)}
+.faq-item.open .ftog{transform:rotate(180deg)}
+.fa{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
+.faq-item.open .fa{max-height:600px}
+.fai{padding:0 24px 20px;border-top:1px solid var(--gray2);padding-top:16px;font-size:.88rem;color:var(--text2);line-height:1.8}
+
+/* -- SOCIAL -- */
+.soc-section{background:#fff}
+.soc-section h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;margin-bottom:6px;letter-spacing:-.03em}
+.soc-section h2 .blue{color:var(--blue)}
+.soc-sub{color:var(--text2);margin-bottom:36px;font-size:.9rem}
+.soc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.soc-card{background:var(--gray);border-radius:var(--r);overflow:hidden;transition:all .35s;cursor:pointer}
+.soc-card:hover{box-shadow:var(--shl);transform:translateY(-5px)}
+.soc-thumb{height:190px;overflow:hidden;position:relative}
+.soc-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;filter:brightness(.92)}
+.soc-card:hover .soc-thumb img{transform:scale(1.07);filter:brightness(1)}
+.soc-handle{padding:14px 16px;display:flex;align-items:center;gap:9px;font-size:.85rem;font-weight:700}
+.sico-tt{background:#000;color:#fff;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;font-weight:900}
+.sico-ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.sico-tg{background:#2AABEE;color:#fff;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+
+/* -- CTA BLOCK -- */
+.cta-block{border-radius:28px;overflow:hidden;display:grid;grid-template-columns:55fr 45fr;box-shadow:0 24px 80px rgba(0,100,255,.2);background:var(--bg);position:relative}
+.cta-block::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 60%);pointer-events:none}
+.cta-left{padding:56px 52px;color:#fff;position:relative}
+.cta-left h2{font-size:clamp(1.6rem,3vw,2.3rem);font-weight:900;margin-bottom:20px;line-height:1.2;letter-spacing:-.03em}
+.cta-left>p{opacity:.88;margin-bottom:20px;font-size:.97rem;line-height:1.7}
+.cta-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px}
+.cta-item{display:flex;align-items:center;gap:8px;font-size:.85rem;opacity:.9}
+.cta-note{font-size:.95rem;font-weight:700;margin-bottom:28px;opacity:1}
+.cta-guarantees{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:36px}
+.cta-g{background:rgba(255,255,255,.12);border-radius:10px;padding:13px 10px;display:flex;align-items:center;gap:9px;font-size:.8rem;font-weight:600;backdrop-filter:blur(4px)}
+.cta-g-ico{font-size:1.2rem;flex-shrink:0}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--blue);padding:16px 34px;border-radius:50px;font-weight:800;font-size:.97rem;transition:all .3s;border:none;cursor:pointer;letter-spacing:-.01em;box-shadow:0 8px 28px rgba(0,0,0,.15)}
+.cta-btn:hover{box-shadow:0 16px 48px rgba(0,0,0,.25);transform:translateY(-3px)}
+.cta-right{position:relative;overflow:hidden;min-height:400px}
+.cta-right img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease}
+.cta-block:hover .cta-right img{transform:scale(1.06)}
+
+/* -- VACANCIES -- */
+.vac-section{background:var(--gray)}
+.vac-section h2{font-size:clamp(1.6rem,2.8vw,2.1rem);font-weight:800;margin-bottom:6px;letter-spacing:-.03em}
+.vac-section h2 .blue{color:var(--blue)}
+.vac-sub{color:var(--text2);margin-bottom:36px;font-size:.9rem}
+.vac-list{display:flex;flex-direction:column;gap:14px;max-width:680px}
+.vac-card{background:#fff;border-radius:var(--r);padding:24px 26px;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:3px solid transparent}
+.vac-card:nth-child(2){margin-left:48px}
+.vac-card:hover{box-shadow:var(--sh);transform:translateX(4px);border-left-color:var(--blue)}
+.vac-card h3{font-size:1rem;font-weight:700;margin-bottom:7px;letter-spacing:-.01em}
+.vac-card p{font-size:.84rem;color:var(--text2);line-height:1.55;margin-bottom:13px}
+.vac-link{color:var(--blue);font-size:.84rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:gap .2s}
+.vac-link:hover{gap:10px}
+
+/* -- FOOTER -- */
+footer{background:#fff;padding:56px 0 28px;border-top:1px solid var(--gray2)}
+.footer-grid{display:grid;grid-template-columns:220px 1fr 290px;gap:44px;margin-bottom:44px}
+.flogo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:1.1rem;margin-bottom:14px;letter-spacing:-.02em}
+.flogo-desc{font-size:.82rem;color:var(--text3);line-height:1.75}
+.fnav h4{font-size:.74rem;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.fnav ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.fnav li a{font-size:.87rem;color:var(--text2);transition:color .2s;display:flex;align-items:center;gap:6px;cursor:pointer}
+.fnav li a:hover{color:var(--blue)}
+.fsoc-row{display:flex;gap:9px;margin-top:4px}
+.fsoc-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .25s;cursor:pointer;font-weight:800}
+.fsoc-btn.tt{background:#000;color:#fff}
+.fsoc-btn.tg{background:#2AABEE;color:#fff}
+.fsoc-btn.ig{background:linear-gradient(45deg,#f09433,#dc2743);color:#fff}
+.fsoc-btn:hover{transform:scale(1.12);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.fcta-col{display:flex;flex-direction:column;gap:12px}
+.fcta-btn2{background:var(--bg);color:#fff;padding:12px 20px;border-radius:50px;font-size:.84rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;border:none;transition:all .25s}
+.fcta-btn2:hover{box-shadow:var(--shb);transform:translateY(-2px)}
+.fbottom{border-top:1px solid var(--gray2);padding-top:22px;text-align:center;font-size:.8rem;color:var(--text3)}
+
+/* -- BTNs -- */
+.btn-blue{background:var(--bg);color:#fff;border:none;padding:14px 32px;border-radius:50px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.btn-blue:hover{box-shadow:var(--shb);transform:translateY(-2px)}
+.btn-outline{background:transparent;border:2px solid var(--blue);color:var(--blue);padding:13px 30px;border-radius:50px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-outline:hover{background:var(--blue);color:#fff;box-shadow:var(--shb)}
+
+/* -- RESPONSIVE -- */
+@media(max-width:960px){
+  .nav-links,.lang-btn{display:none}
+  .hamburger{display:flex}
+  .hero-feats,.prob-grid,.srv-intro,.proc-grid,.cmp-section .tw,.res-grid,.plan-card,.cta-block,.footer-grid{grid-template-columns:1fr}
+  .srv-grid{grid-template-columns:1fr 1fr}
+  .calc-grid{grid-template-columns:1fr 1fr}
+  .soc-grid{grid-template-columns:1fr 1fr}
+  .cta-right{min-height:280px}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .srv-grid,.calc-grid,.soc-grid,.cta-list,.cta-guarantees{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .hero-feats{grid-template-columns:1fr 1fr}
+  .counter-strip-inner{grid-template-columns:1fr}
+  .counter-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.2);padding:12px 20px}
+  .counter-item:last-child{border-bottom:none}
+}
+</style>
+</head>
+<body>
+
+<!-- -- NAV -- -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-dot"></div>
+    OWN AGENCY
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">OnlyFans</a></li>
+    <li><a href="#services">Fansly</a></li>
+    <li><a href="#vacancies" data-ru="Вакансии" data-en="Vacancies">Вакансии</a></li>
+    <li><a href="#faq" data-ru="Блог" data-en="Blog">Блог</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="lang-btn" id="langToggle" onclick="toggleLang()">English</button>
+    <div class="nav-soc">
+      <button class="nsb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.78 1.53V6.84a4.84 4.84 0 0 1-1.02-.15z"/></svg></button>
+      <button class="nsb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></button>
+      <button class="nsb"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></button>
+    </div>
+    <a href="https://t.me/ownagency_bot" target="_blank" class="bcn" style="text-decoration:none" data-ru="Оставить заявку" data-en="Apply now">Оставить заявку</a>
+    <button class="hamburger" id="hb"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- -- HERO -- -->
+<div class="hero-wrap">
+  <div class="hero-img" id="heroImg"></div>
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <h1 style="animation:fadeUp .9s ease both" data-ru="Превратите свою популярность<br>в стабильный доход с ведущим<br><span class='highlight'>OnlyFans-агентством</span>" data-en="Turn your popularity into<br>stable income with the leading<br><span class='highlight'>OnlyFans Agency</span>">
+        Превратите свою популярность<br>в стабильный доход с ведущим<br>
+        <span class="highlight">OnlyFans-агентством</span>
+      </h1>
+      <p class="hero-desc" style="animation:fadeUp .9s .12s ease both" data-ru="OWN AGENCY — профессиональное агентство полного цикла для контент-креаторов OnlyFans. Мы берём на себя все аспекты управления и продвижения твоего аккаунта: от создания контент-стратегии до круглосуточного чаттинга с подписчиками. Сосредоточься на творчестве — а мы обеспечим успех:" data-en="OWN AGENCY — a full-cycle professional agency for OnlyFans content creators. We handle all aspects of managing and promoting your account: from content strategy to 24/7 chatting with subscribers. Focus on creativity — we'll ensure your success:">OWN AGENCY — профессиональное агентство полного цикла для контент-креаторов OnlyFans. Мы берём на себя все аспекты управления и продвижения твоего аккаунта: от создания контент-стратегии до круглосуточного чаттинга с подписчиками. Сосредоточься на творчестве — а мы обеспечим успех:</p>
+      <div class="hero-feats" style="animation:fadeUp .9s .22s ease both">
+        <div class="hf"><div class="hf-ico">🏆</div><span data-ru="Вхождение в топ" data-en="Top ranking">Вхождение в топ</span></div>
+        <div class="hf"><div class="hf-ico">⟳</div><span data-ru="Поддержка 24/7" data-en="24/7 Support">Поддержка 24/7</span></div>
+        <div class="hf"><div class="hf-ico">$</div><span data-ru="Без предоплат" data-en="No prepayments">Без предоплат</span></div>
+      </div>
+      <div style="animation:fadeUp .9s .32s ease both">
+        <a href="https://t.me/ownagency_bot" target="_blank" class="hero-btn">
+          <div class="tg-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div>
+          <span data-ru="Начать зарабатывать больше" data-en="Start earning more">Начать зарабатывать больше</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- -- PLATFORMS TICKER -- -->
+<div class="platforms">
+  <div style="overflow:hidden">
+    <div class="plat-track" id="platTrack">
+      <span class="plat-item of">OnlyFans</span>
+      <span class="plat-item rd">Reddit</span>
+      <span class="plat-item ph">PornHub</span>
+      <span class="plat-item yt">YouTube</span>
+      <span class="plat-item tt">TikTok</span>
+      <span class="plat-item of">Instagram</span>
+      <span class="plat-item rd">Telegram</span>
+      <span class="plat-item of">OnlyFans</span>
+      <span class="plat-item rd">Reddit</span>
+      <span class="plat-item ph">PornHub</span>
+      <span class="plat-item yt">YouTube</span>
+      <span class="plat-item tt">TikTok</span>
+      <span class="plat-item of">Instagram</span>
+      <span class="plat-item rd">Telegram</span>
+    </div>
+  </div>
+</div>
+
+<!-- -- COUNTER STRIP -- -->
+<div class="counter-strip">
+  <div class="container">
+    <div class="counter-strip-inner">
+      <div class="counter-item rv"><span class="counter-num" id="modelCounter" data-target="0">0</span><div class="counter-lbl" data-ru="Успешных моделей" data-en="Successful models">Успешных моделей</div></div>
+      <div class="counter-item rv"><span class="counter-num" data-target="50" data-suffix="%">0%</span><div class="counter-lbl" data-ru="Выплата модели" data-en="Model payout">Выплата модели</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- -- CALCULATOR -- -->
+<section id="calculator" class="calc-section">
+  <div class="container">
+    <h2 class="calc-title rv"><span data-ru="Калькулятор" data-en="Calculator">Калькулятор</span> <span style="color:var(--blue)" data-ru="потенциального дохода" data-en="of potential income">потенциального дохода</span></h2>
+    <p class="calc-sub rv" data-ru="Рассчитай, сколько будешь зарабатывать с профессиональным управлением аккаунтом" data-en="Calculate how much you'll earn with professional account management">Рассчитай, сколько будешь зарабатывать с профессиональным управлением аккаунтом</p>
+    <div class="calc-box rv">
+      <div class="calc-grid">
+        <div class="calc-field">
+          <label data-ru="Введи текущий доход с Fansly" data-en="Enter your current Fansly income">Введи текущий доход с Fansly</label>
+          <div class="cinput-lbl" data-ru="В долларах $" data-en="In dollars $">В долларах $</div>
+          <input type="number" class="cinput" id="c-income" value="500" min="0">
+        </div>
+        <div class="calc-field">
+          <label data-ru="Сколько планируешь сотрудничать с OWN AGENCY?" data-en="How long do you plan to work with OWN AGENCY?">Сколько планируешь сотрудничать с OWN AGENCY?</label>
+          <div class="slider-row"><span data-ru="2 Мес." data-en="2 Mo.">2 Мес.</span><span data-ru="24 Мес." data-en="24 Mo.">24 Мес.</span></div>
+          <input type="range" class="cslider" id="c-months" min="2" max="24" value="10">
+          <div class="slval" id="c-months-val">10 мес.</div>
+        </div>
+        <div class="calc-field">
+          <label data-ru="Уровень английского" data-en="English level">Уровень английского</label>
+          <div class="eng-btns">
+            <button class="eng-btn active" data-eng="1">A1</button>
+            <button class="eng-btn" data-eng="1.25">A2</button>
+            <button class="eng-btn" data-eng="1.55">B1</button>
+            <button class="eng-btn" data-eng="1.85">B2</button>
+            <button class="eng-btn" data-eng="2.3">C1</button>
+          </div>
+        </div>
+        <div class="calc-field">
+          <label data-ru="Сколько контента будешь снимать в неделю?" data-en="How much content will you shoot per week?">Сколько контента будешь снимать в неделю?</label>
+          <div class="slider-row"><span>10</span><span>250</span></div>
+          <input type="range" class="cslider" id="c-content" min="10" max="250" value="80">
+          <div class="slval" id="c-content-val">80 фото/нед</div>
+        </div>
+        <div class="calc-field">
+          <label data-ru="Есть ли опыт в Fansly/Onlyfans и других?" data-en="Do you have Fansly/OnlyFans experience?">Есть ли опыт в Fansly/Onlyfans и других?</label>
+          <div class="slider-row"><span data-ru="0 Мес." data-en="0 Mo.">0 Мес.</span><span data-ru="24 Мес." data-en="24 Mo.">24 Мес.</span></div>
+          <input type="range" class="cslider" id="c-exp" min="0" max="24" value="4">
+          <div class="slval" id="c-exp-val">4 мес. опыта</div>
+        </div>
+        <div class="calc-field">
+          <label data-ru="Согласна на продвижение в соцсетях Reddit" data-en="Agree to promotion on Reddit social media">Согласна на продвижение в соцсетях Reddit</label>
+          <select class="cinput" id="c-reddit" style="margin-top:4px">
+            <option value="1" data-ru="Выберите соцсети" data-en="Choose social media">Выберите соцсети</option>
+            <option value="1.3">Reddit</option>
+            <option value="1.2">Instagram</option>
+            <option value="1.1">TikTok</option>
+            <option value="1.4">Reddit + Instagram</option>
+            <option value="1.5" data-ru="Все платформы" data-en="All platforms">Все платформы</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-result-row">
+        <div class="calc-result-label" data-ru="Сколько будешь зарабатывать через 6 месяцев с OWN AGENCY" data-en="How much you'll earn in 6 months with OWN AGENCY">Сколько будешь зарабатывать через 6 месяцев с OWN AGENCY</div>
+        <div class="calc-result-amount" id="c-result">3 925 $</div>
+      </div>
+      <p class="calc-note" data-ru="* Расчёт является ориентировочным и зависит от ниши, активности и платформы" data-en="* The calculation is approximate and depends on niche, activity and platform">* Расчёт является ориентировочным и зависит от ниши, активности и платформы</p>
+    </div>
+  </div>
+</section>
+
+<!-- -- PROBLEMS -- -->
+<section id="problems" class="prob-section">
+  <div class="container">
+    <div class="prob-grid">
+      <div class="prob-left">
+        <h2 class="rv" data-ru="Типичные проблемы моделей<br><span>и контент-креаторов</span>" data-en="Typical problems of models<br><span>and content creators</span>">Типичные проблемы моделей<br><span>и контент-креаторов</span></h2>
+        <p class="rv" data-ru="Большинство авторов контента Fansly/OnlyFans сталкиваются с одними и теми же трудностями: низкий охват, сложности с привлечением щедрых подписчиков, нехватка времени на чаттинг и продвижение в социальных сетях. Без профессиональной команды сложно конкурировать с топ-моделями и раскрыть полный потенциал заработка." data-en="Most Fansly/OnlyFans content creators face the same challenges: low reach, difficulty attracting generous subscribers, lack of time for chatting and social media promotion. Without a professional team, it's hard to compete with top models and unlock your full earning potential.">Большинство авторов контента Fansly/OnlyFans сталкиваются с одними и теми же трудностями: низкий охват, сложности с привлечением щедрых подписчиков, нехватка времени на чаттинг и продвижение в социальных сетях. Без профессиональной команды сложно конкурировать с топ-моделями и раскрыть полный потенциал заработка.</p>
+        <div class="prob-list">
+          <div class="prob-item rv"><div class="prob-ico">✕</div><div class="prob-text" data-ru="Непонятно, с чего начать" data-en="Don't know where to start">Непонятно, с чего начать</div></div>
+          <div class="prob-item rv"><div class="prob-ico">✕</div><div class="prob-text" data-ru="Нет стабильного потока подписчиков" data-en="No steady subscriber flow">Нет стабильного потока подписчиков</div></div>
+          <div class="prob-item rv"><div class="prob-ico">✕</div><div class="prob-text" data-ru="Низкие доходы от PPV" data-en="Low PPV revenue">Низкие доходы от PPV</div></div>
+          <div class="prob-item rv"><div class="prob-ico">✕</div><div class="prob-text" data-ru="Нет времени на чаттинг" data-en="No time for chatting">Нет времени на чаттинг</div></div>
+          <div class="prob-item rv"><div class="prob-ico">✕</div><div class="prob-text" data-ru="Неэффективное продвижение в соцсетях" data-en="Ineffective social media promotion">Неэффективное продвижение в соцсетях</div></div>
+        </div>
+      </div>
+      <div class="prob-img rv-r">
+        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=700&q=85&fit=crop" alt="Model with laptop" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- SERVICES -- -->
+<section id="services" class="srv-section">
+  <div class="container">
+    <div class="srv-intro">
+      <div class="rv-l">
+        <h2 data-ru="Что мы <span>предлагаем?</span>" data-en="What we <span>offer?</span>">Что мы <span>предлагаем?</span></h2>
+      </div>
+      <div class="rv-r">
+        <p data-ru="OWN AGENCY Agency предоставляет полный спектр услуг профессионального управления Fansly/OnlyFans-аккаунтом. Команда специалистов работает в разных часовых поясах, обеспечивая круглосуточную поддержку и продвижение. Мы создаём персонализированные стратегии для каждого креатора, учитывая цели и аудиторию:" data-en="OWN AGENCY Agency provides a full range of professional Fansly/OnlyFans account management services. Our team of specialists works across different time zones, ensuring 24/7 support and promotion. We create personalized strategies for each creator, considering goals and audience:">OWN AGENCY Agency предоставляет полный спектр услуг профессионального управления Fansly/OnlyFans-аккаунтом. Команда специалистов работает в разных часовых поясах, обеспечивая круглосуточную поддержку и продвижение. Мы создаём персонализированные стратегии для каждого креатора, учитывая цели и аудиторию:</p>
+      </div>
+    </div>
+    <div class="srv-grid">
+      <div class="srv-card rv"><div class="srv-ico">🌐</div><h3 data-ru="Полное сопровождение неанглоязычных креаторов" data-en="Full support for non-English speaking creators">Полное сопровождение неанглоязычных креаторов</h3><p data-ru="Работаем с моделями из любой страны, персональные ассистенты с опытом в adult-индустрии. За каждой моделью — свой менеджер, команда чаттеров, ассистент и траффер." data-en="We work with models from any country, personal assistants with experience in the adult industry. Each model gets their own manager, chatting team, assistant and traffic specialist.">Работаем с моделями из любой страны, персональные ассистенты с опытом в adult-индустрии. За каждой моделью — свой менеджер, команда чаттеров, ассистент и траффер.</p></div>
+      <div class="srv-card rv"><div class="srv-ico">📣</div><h3 data-ru="Маркетинг" data-en="Marketing">Маркетинг</h3><p data-ru="Instagram, TikTok, Reddit, YouTube, PornHub — закупка рекламы у пабликов и популярных креаторов, кросс-продвижение, генерация целевого трафика. Лучшие SEO-стратегии." data-en="Instagram, TikTok, Reddit, YouTube, PornHub — ad buying from communities and popular creators, cross-promotion, targeted traffic generation. Best SEO strategies.">Instagram, TikTok, Reddit, YouTube, PornHub — закупка рекламы у пабликов и популярных креаторов, кросс-продвижение, генерация целевого трафика. Лучшие SEO-стратегии.</p></div>
+      <div class="srv-card rv"><div class="srv-ico">🎬</div><h3 data-ru="Производство контента через сеть креативщиков" data-en="Content production through a network of creatives">Производство контента через сеть креативщиков</h3><p data-ru="Фото, видео, обработка, сценарии, монтаж. Редактирование и загрузку контента полностью берёт на себя агентство — отбор лучших кадров, постинг по расписанию." data-en="Photos, videos, editing, scripts, montage. The agency fully handles content editing and uploading — selecting the best shots, scheduled posting.">Фото, видео, обработка, сценарии, монтаж. Редактирование и загрузку контента полностью берёт на себя агентство — отбор лучших кадров, постинг по расписанию.</p></div>
+      <div class="srv-card rv"><div class="srv-ico">💬</div><h3 data-ru="24/7 профессиональный чаттинг" data-en="24/7 professional chatting">24/7 профессиональный чаттинг</h3><p data-ru="С командой экспертов для вовлечения и монетизации фанатов" data-en="With a team of experts for engaging and monetizing fans">С командой экспертов для вовлечения и монетизации фанатов</p></div>
+      <div class="srv-card rv"><div class="srv-ico">💻</div><h3 data-ru="Круглосуточное управление аккаунтом" data-en="24/7 account management">Круглосуточное управление аккаунтом</h3><p data-ru="От планирования графика публикаций до оформления и редактирования контента" data-en="From scheduling publications to formatting and editing content">От планирования графика публикаций до оформления и редактирования контента</p></div>
+      <a href="https://t.me/ownagency_bot" target="_blank" class="srv-card srv-cta-card rv" style="text-decoration:none"><div class="srv-ico">✨</div><h3 data-ru="Выбрать подходящий пакет" data-en="Choose the right package">Выбрать подходящий пакет</h3><p data-ru="Подберём оптимальное решение под ваши цели и возможности прямо сейчас" data-en="We'll find the optimal solution for your goals and capabilities right now">Подберём оптимальное решение под ваши цели и возможности прямо сейчас</p><br><span class="btn-outline" style="border-color:rgba(255,255,255,.5);color:#fff;font-size:.82rem;padding:9px 18px" data-ru="Выбрать →" data-en="Choose →">Выбрать →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- -- PROCESS -- -->
+<section id="process" class="proc-section">
+  <div class="container">
+    <div class="proc-grid">
+      <div class="proc-left">
+        <h2 class="rv" data-ru="Прозрачный процесс от знакомства<br><span class='blue'>ДО ТОП-ДОХОДОВ</span>" data-en="Transparent process from introduction<br><span class='blue'>TO TOP EARNINGS</span>">Прозрачный процесс от знакомства<br><span class="blue">ДО ТОП-ДОХОДОВ</span></h2>
+        <p class="rv" data-ru="Наша работа построена на чёткой системе из 5 компонентов. Каждый шаг детально проработан и направлен на максимальный результат. Ты получаешь персонального менеджера, который координирует всю команду и держит тебя в курсе каждого действия. Полная прозрачность процессов и ежедневная отчётность:" data-en="Our work is built on a clear 5-component system. Each step is carefully designed for maximum results. You get a personal manager who coordinates the entire team and keeps you updated on every action. Full process transparency and daily reporting:">Наша работа построена на чёткой системе из 5 компонентов. Каждый шаг детально проработан и направлен на максимальный результат. Ты получаешь персонального менеджера, который координирует всю команду и держит тебя в курсе каждого действия. Полная прозрачность процессов и ежедневная отчётность:</p>
+        <div class="proc-steps">
+          <div class="proc-step active-step rv" onclick="setStep(this)"><div class="proc-num active">1</div><div class="proc-step-text" data-ru="Разработка персонального бренда, определение ниши" data-en="Personal brand development, niche identification">Разработка персонального бренда, определение ниши</div></div>
+          <div class="proc-step rv" onclick="setStep(this)"><div class="proc-num inactive">2</div><div class="proc-step-text" data-ru="Построение стратегии продвижения" data-en="Building a promotion strategy">Построение стратегии продвижения</div></div>
+          <div class="proc-step rv" onclick="setStep(this)"><div class="proc-num inactive">3</div><div class="proc-step-text" data-ru="Подбор команды специалистов" data-en="Assembling a team of specialists">Подбор команды специалистов</div></div>
+          <div class="proc-step rv" onclick="setStep(this)"><div class="proc-num inactive">4</div><div class="proc-step-text" data-ru="Обучение созданию контента, который будет популярен и обеспечит подписки" data-en="Training in creating content that will be popular and drive subscriptions">Обучение созданию контента, который будет популярен и обеспечит подписки</div></div>
+          <div class="proc-step rv" onclick="setStep(this)"><div class="proc-num inactive">5</div><div class="proc-step-text" data-ru="Активное ведение аккаунта — постинг, чаттинг, привлечение трафика на страницу" data-en="Active account management — posting, chatting, driving traffic to the page">Активное ведение аккаунта — постинг, чаттинг, привлечение трафика на страницу</div></div>
+        </div>
+      </div>
+      <div class="proc-phone rv-r">
+        <div class="proc-phone-glow"></div>
+        <div class="proc-phone-img">
+          <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&q=85&fit=crop" alt="Phone" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- COMPARISON -- -->
+<section id="comparison" class="cmp-section">
+  <div class="container">
+    <h2 class="rv" data-ru="Почему топ-модели выбирают именно<br><span class='blue'>OWN AGENCY Agency?</span>" data-en="Why do top models choose<br><span class='blue'>OWN AGENCY Agency?</span>">Почему топ-модели выбирают именно<br><span class="blue">OWN AGENCY Agency?</span></h2>
+    <p class="cmp-sub rv" data-ru="Мы фокусируемся на долгосрочном сотрудничестве и сделаем всё, чтобы ты получала стабильно высокий доход." data-en="We focus on long-term partnerships and will do everything to ensure you receive consistently high income.">Мы фокусируемся на долгосрочном сотрудничестве и сделаем всё, чтобы ты получала стабильно высокий доход.</p>
+    <div class="cmp-table rv">
+      <div class="cmp-head">
+        <div class="cmp-hc">Own Agency</div>
+        <div class="cmp-hc" data-ru="Другие агентства" data-en="Other agencies">Другие агентства</div>
+      </div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Помогаем найти свою нишу и раскрыть индивидуальность. Успешные кейсы в категориях «милф», «доминация», скромных моделей и моделей, скрывающих своё лицо." data-en="We help you find your niche and reveal your individuality. Successful cases in categories like MILF, domination, modest models, and faceless models.">Помогаем найти свою нишу и раскрыть индивидуальность. Успешные кейсы в категориях «милф», «доминация», скромных моделей и моделей, скрывающих своё лицо.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="Работают только с самыми востребованными типажами (в основном baby face)." data-en="Only work with the most popular types (mainly baby face).">Работают только с самыми востребованными типажами (в основном baby face).</span></div></div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Развиваем моделей с нуля. Мы создадим аккаунт и выведем его в топ. Сами делаем модель популярной и формируем фан-базу." data-en="We develop models from scratch. We'll create an account and bring it to the top. We make the model popular and build a fan base.">Развиваем моделей с нуля. Мы создадим аккаунт и выведем его в топ. Сами делаем модель популярной и формируем фан-базу.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="Предпочитают раскручивать моделей, у которых уже есть поклонники." data-en="Prefer to promote models who already have fans.">Предпочитают раскручивать моделей, у которых уже есть поклонники.</span></div></div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Делаем всё возможное для постоянного роста дохода. Ориентируемся на долгосрочное сотрудничество." data-en="We do everything possible for constant income growth. We focus on long-term partnerships.">Делаем всё возможное для постоянного роста дохода. Ориентируемся на долгосрочное сотрудничество.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="Обеспечивают кратковременный взлёт, но уже через 2-3 месяца доходы падают." data-en="Provide a short-term boost, but income drops after 2-3 months.">Обеспечивают кратковременный взлёт, но уже через 2-3 месяца доходы падают.</span></div></div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Полностью прозрачные условия — никаких стартовых взносов и скрытых платежей." data-en="Fully transparent terms — no upfront fees or hidden payments.">Полностью прозрачные условия — никаких стартовых взносов и скрытых платежей.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="В дополнение к комиссии могут запрашивать отдельную оплату различных услуг." data-en="In addition to commission, they may charge separately for various services.">В дополнение к комиссии могут запрашивать отдельную оплату различных услуг.</span></div></div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Персональный подход и индивидуальные стратегии роста." data-en="Personal approach and individual growth strategies.">Персональный подход и индивидуальные стратегии роста.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="Шаблонные решения." data-en="Template solutions.">Шаблонные решения.</span></div></div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Комплексные услуги: от персонального брендинга до эксклюзивных воронок продаж. Работа с личным менеджером." data-en="Comprehensive services: from personal branding to exclusive sales funnels. Working with a personal manager.">Комплексные услуги: от персонального брендинга до эксклюзивных воронок продаж. Работа с личным менеджером.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="Точечные услуги без закрепления постоянной команды." data-en="Selective services without a dedicated team.">Точечные услуги без закрепления постоянной команды.</span></div></div>
+      <div class="cmp-row"><div class="cmp-cell"><span class="ok">✓</span><span data-ru="Есть реальный офис в Санкт-Петербурге, где можно встретиться и пообщаться с командой." data-en="We have a real office in Saint Petersburg where you can meet and talk with the team.">Есть реальный офис в Санкт-Петербурге, где можно встретиться и пообщаться с командой.</span></div><div class="cmp-cell"><span class="nx">✕</span><span data-ru="В большинстве случаев виртуальные и не имеют офиса." data-en="In most cases virtual and have no office.">В большинстве случаев виртуальные и не имеют офиса.</span></div></div>
+      <div class="cmp-footer">
+        <div class="cmp-footer-text">
+          <p data-ru="Мы проанализировали множество агентств и предлагаем наиболее интересные условия на рынке. Всё предельно прозрачно, работаем на результат и ориентируемся на долгосрочное сотрудничество." data-en="We've analyzed many agencies and offer the most attractive terms on the market. Everything is fully transparent, we work for results and focus on long-term partnerships.">Мы проанализировали множество агентств и предлагаем наиболее интересные условия на рынке. Всё предельно прозрачно, работаем на результат и ориентируемся на долгосрочное сотрудничество.</p>
+          <ul>
+            <li data-ru="Индивидуальная работа против шаблонных решений" data-en="Individual approach vs. template solutions">Индивидуальная работа против шаблонных решений</li>
+            <li data-ru="Прозрачная статистика" data-en="Transparent statistics">Прозрачная статистика</li>
+            <li data-ru="Персональный менеджер всегда на связи" data-en="Personal manager always in touch">Персональный менеджер всегда на связи</li>
+          </ul>
+        </div>
+        <a href="https://t.me/ownagency_bot" target="_blank" class="btn-blue" style="text-decoration:none" data-ru="Стать частью ТОП-команды" data-en="Join the TOP team">Стать частью ТОП-команды</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- RESULTS -- -->
+<section id="results" class="res-section">
+  <div class="container">
+    <div class="res-grid">
+      <div class="res-left">
+        <h2 class="rv" data-ru="Работаем на <span class='blue'>результат</span>" data-en="We work for <span class='blue'>results</span>">Работаем на <span class="blue">результат</span></h2>
+        <p class="rv" data-ru="Если ты будешь соблюдать рекомендации по контенту и графику публикаций, то гарантируем:" data-en="If you follow our recommendations on content and publishing schedule, we guarantee:">Если ты будешь соблюдать рекомендации по контенту и графику публикаций, то гарантируем:</p>
+        <div class="res-list">
+          <div class="res-item rv"><span class="res-dot">●</span><span data-ru="Первые продажи в течение 2 недель" data-en="First sales within 2 weeks">Первые продажи в течение 2 недель</span></div>
+          <div class="res-item rv"><span class="res-dot">●</span><span data-ru="Стабильный доход к концу 1-го месяца" data-en="Stable income by the end of the 1st month">Стабильный доход к концу 1-го месяца</span></div>
+          <div class="res-item rv"><span class="res-dot">●</span><span data-ru="Выплаты строго по графику: никаких задержек, фиксированные даты." data-en="Payments strictly on schedule: no delays, fixed dates.">Выплаты строго по графику: никаких задержек, фиксированные даты.</span></div>
+          <div class="res-item rv"><span class="res-dot">●</span><span data-ru="Выплата модели составляет до 50%. Без скрытых комиссий (за фотосессию, рекламу и т.д)." data-en="Model payout is up to 50%. No hidden fees (for photoshoots, ads, etc.).">Выплата модели составляет до 50%. Без скрытых комиссий (за фотосессию, рекламу и т.д).</span></div>
+        </div>
+        <a href="https://t.me/ownagency_bot" target="_blank" class="btn-blue rv" style="text-decoration:none" data-ru="Получить гарантии письменно" data-en="Get guarantees in writing">Получить гарантии письменно</a>
+      </div>
+      <div class="res-img rv-r">
+        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=700&q=85&fit=crop" alt="Working on laptop" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- PLAN -- -->
+<section id="plan" class="plan-section">
+  <div class="container">
+    <h2 class="rv" data-ru="Оптимальный <span class='blue'>план сотрудничества</span>" data-en="Optimal <span class='blue'>partnership plan</span>">Оптимальный <span class="blue">план сотрудничества</span></h2>
+    <div class="plan-card rv">
+      <div class="plan-left">
+        <h3 data-ru="«Полное продвижение» (аутсорсинг аккаунта) — <span class='blue'>для максимального роста доходов.</span>" data-en="«Full promotion» (account outsourcing) — <span class='blue'>for maximum income growth.</span>">«Полное продвижение» (аутсорсинг аккаунта) — <span class="blue">для максимального роста доходов.</span></h3>
+        <p data-ru="Полное ведение аккаунта и максимальная монетизация. Берём на себя чаттинг, маркетинг и аналитику. Через два месяца сотрудничества за свой счёт подключаем ведение социальных сетей и организовываем фотосъёмки." data-en="Full account management and maximum monetization. We handle chatting, marketing, and analytics. After two months of collaboration, we cover social media management and organize photoshoots at our expense.">Полное ведение аккаунта и максимальная монетизация. Берём на себя чаттинг, маркетинг и аналитику. Через два месяца сотрудничества за свой счёт подключаем ведение социальных сетей и организовываем фотосъёмки.</p>
+        <p data-ru="Все услуги, оказываемые по продвижению и ведению аккаунта Fansly/OnlyFans, осуществляются без доплат и скрытых комиссий, в том числе:" data-en="All services for promoting and managing a Fansly/OnlyFans account are provided without additional charges or hidden fees, including:">Все услуги, оказываемые по продвижению и ведению аккаунта Fansly/OnlyFans, осуществляются без доплат и скрытых комиссий, в том числе:</p>
+        <ul class="plan-list">
+          <li><span class="plan-dot">●</span><span data-ru="Ведение Instagram/TikTok" data-en="Instagram/TikTok management">Ведение Instagram/TikTok</span></li>
+          <li><span class="plan-dot">●</span><span data-ru="Личный ассистент" data-en="Personal assistant">Личный ассистент</span></li>
+          <li><span class="plan-dot">●</span><span data-ru="Индивидуальные фотосессии — по договорённости" data-en="Individual photoshoots — by arrangement">Индивидуальные фотосессии — по договорённости</span></li>
+        </ul>
+        <a href="https://t.me/ownagency_bot" target="_blank" class="btn-blue" style="text-decoration:none" data-ru="Начать работу" data-en="Get started">Начать работу</a>
+      </div>
+      <div class="plan-img">
+        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=700&q=85&fit=crop&crop=top" alt="Model" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- FAQ -- -->
+<section id="faq" class="faq-section">
+  <div class="container">
+    <h2 class="rv" data-ru="Ответы на главные вопросы <span class='blue'>о сотрудничестве</span>" data-en="Answers to key questions <span class='blue'>about partnership</span>">Ответы на главные вопросы <span class="blue">о сотрудничестве</span></h2>
+    <p class="faq-sub rv" data-ru="Собрали наиболее частые вопросы от моделей о работе с OWN AGENCY Agency. Если твоего вопроса нет в списке — напиши нашему HR-менеджеру в Telegram, и получи персональную консультацию в течение 12 часов." data-en="We've collected the most common questions from models about working with OWN AGENCY Agency. If your question isn't listed — message our HR manager on Telegram and get a personal consultation within 12 hours.">Собрали наиболее частые вопросы от моделей о работе с OWN AGENCY Agency. Если твоего вопроса нет в списке — напиши нашему HR-менеджеру в Telegram, и получи персональную консультацию в течение 12 часов.</p>
+    <div class="faq-list">
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Какие требования к оборудованию?" data-en="What are the equipment requirements?">Какие требования к оборудованию?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Для старта тебе потребуется всего лишь телефон. Желательно, чтобы это был iPhone с хорошим качеством съёмки. Дополнительно рекомендуем приобрести кольцевую лампу — стоит она недорого, так что серьёзных вложений на начальном этапе не потребуется." data-en="To get started, all you need is a phone. Ideally, an iPhone with good camera quality. We also recommend getting a ring light — it's inexpensive, so no serious investment is needed at the initial stage.">Для старта тебе потребуется всего лишь телефон. Желательно, чтобы это был iPhone с хорошим качеством съёмки. Дополнительно рекомендуем приобрести кольцевую лампу — стоит она недорого, так что серьёзных вложений на начальном этапе не потребуется.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Помогаете ли новичкам?" data-en="Do you help beginners?">Помогаете ли новичкам?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Да, мы помогаем начинающим моделям, в том числе тем, у кого нет опыта на платформе Онли Фанс. Полностью запускаем аккаунт с нуля: проводим регистрацию, обучаем, как снимать контент, даём задания, сопровождаем на всех этапах. В твоём распоряжении будет целый креативный отдел.<br><br>Для каждой модели разрабатываем персональный бренд и стиль, который позволяет выразить индивидуальность и выделяться среди конкуренток. Регулярно проводим анализ и аудит активностей." data-en="Yes, we help beginner models, including those with no OnlyFans platform experience. We fully launch an account from scratch: handle registration, teach content creation, give assignments, and support you at every stage. You'll have an entire creative department at your disposal.<br><br>For each model, we develop a personal brand and style that allows you to express individuality and stand out from competitors. We regularly analyze and audit activities.">Да, мы помогаем начинающим моделям, в том числе тем, у кого нет опыта на платформе Онли Фанс. Полностью запускаем аккаунт с нуля: проводим регистрацию, обучаем, как снимать контент, даём задания, сопровождаем на всех этапах. В твоём распоряжении будет целый креативный отдел.<br><br>Для каждой модели разрабатываем персональный бренд и стиль, который позволяет выразить индивидуальность и выделяться среди конкуренток. Регулярно проводим анализ и аудит активностей.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="С какими типами моделей вы работаете?" data-en="What types of models do you work with?">С какими типами моделей вы работаете?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Нам важнее не конкретный типаж, а харизма, умение держаться в кадре, ответственность. Рассматриваем все типажи индивидуально — каждый человек уникален, ставить строгие рамки нет смысла. Мы ищем индивидуальность и «изюминку»." data-en="What matters to us is not a specific type, but charisma, ability to be on camera, and responsibility. We consider all types individually — every person is unique, setting strict limits makes no sense. We look for individuality and a unique spark.">Нам важнее не конкретный типаж, а харизма, умение держаться в кадре, ответственность. Рассматриваем все типажи индивидуально — каждый человек уникален, ставить строгие рамки нет смысла. Мы ищем индивидуальность и «изюминку».</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Как защищается приватность и анонимность?" data-en="How is privacy and anonymity protected?">Как защищается приватность и анонимность?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Мы ставим геоблоки, страницы на Fansly доступны только подписчикам с привязанной картой. Русскоязычные пользователи не смогут получить доступ и увидеть твой контент. Однако стоит понимать: в интернете 100% гарантий нет." data-en="We set geo-blocks, Fansly pages are only accessible to subscribers with a linked card. Russian-speaking users won't be able to access and see your content. However, it's important to understand: there are no 100% guarantees on the internet.">Мы ставим геоблоки, страницы на Fansly доступны только подписчикам с привязанной картой. Русскоязычные пользователи не смогут получить доступ и увидеть твой контент. Однако стоит понимать: в интернете 100% гарантий нет.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Какой доход реально получить?" data-en="What income can you realistically earn?">Какой доход реально получить?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="В первый месяц модели в среднем зарабатывают от $1000 до $7000. Топ-модели могут зарабатывать значительно больше. Многое зависит от активности, качества контента и следования нашим рекомендациям." data-en="In the first month, models earn on average from $1,000 to $7,000. Top models can earn significantly more. Much depends on activity, content quality, and following our recommendations.">В первый месяц модели в среднем зарабатывают от $1000 до $7000. Топ-модели могут зарабатывать значительно больше. Многое зависит от активности, качества контента и следования нашим рекомендациям.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Нужно ли разбираться в маркетинге?" data-en="Do I need to understand marketing?">Нужно ли разбираться в маркетинге?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Разбираться в продвижении не нужно — мы берём эти вопросы на себя. Твоя задача — только снимать контент. Это уникальная возможность полностью сосредоточиться на творчестве, не отвлекаясь на рекламные и административные проблемы." data-en="You don't need to understand promotion — we handle those matters. Your only task is creating content. This is a unique opportunity to fully focus on creativity without being distracted by advertising and administrative issues.">Разбираться в продвижении не нужно — мы берём эти вопросы на себя. Твоя задача — только снимать контент. Это уникальная возможность полностью сосредоточиться на творчестве, не отвлекаясь на рекламные и административные проблемы.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Сколько времени нужно уделять контенту?" data-en="How much time do I need to dedicate to content?">Сколько времени нужно уделять контенту?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="В среднем — 15-30 часов в неделю. Топ-модели снимают больше, включая индивидуальные заказы и контент для соцсетей." data-en="On average — 15-30 hours per week. Top models shoot more, including individual orders and social media content.">В среднем — 15-30 часов в неделю. Топ-модели снимают больше, включая индивидуальные заказы и контент для соцсетей.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Как быстро я увижу первые результаты?" data-en="How quickly will I see first results?">Как быстро я увижу первые результаты?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Первые результаты видны уже в первый месяц. Первую выплату можно получить через 2 недели после поступления первых средств на аккаунт." data-en="First results are visible within the first month. The first payment can be received within 2 weeks after the first funds arrive to the account.">Первые результаты видны уже в первый месяц. Первую выплату можно получить через 2 недели после поступления первых средств на аккаунт.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Какой возраст моделей?" data-en="What age range for models?">Какой возраст моделей?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="В основном работаем с девушками от 18 до 35 лет, но готовы рассмотреть и старше, если модель ухоженная, ответственная и делает качественный контент. Младше 18 лет — категорически нет." data-en="We mainly work with women aged 18 to 35, but we're open to considering older applicants if the model is well-groomed, responsible, and produces quality content. Under 18 — absolutely not.">В основном работаем с девушками от 18 до 35 лет, но готовы рассмотреть и старше, если модель ухоженная, ответственная и делает качественный контент. Младше 18 лет — категорически нет.</div></div></div>
+      <div class="faq-item rv open"><div class="fq"><span data-ru="Требуется ли знание английского?" data-en="Is English proficiency required?">Требуется ли знание английского?</span><div class="ftog">▾</div></div><div class="fa"><div class="fai" data-ru="Если ты не знаешь иностранных языков, ничего страшного. В команде OWN AGENCY Agency есть профессионалы-секстеры, которые ведут переписку. Ты, как создатель контента, можешь заниматься исключительно съёмками новых материалов." data-en="If you don't speak foreign languages, that's perfectly fine. The OWN AGENCY Agency team has professional sexters who handle correspondence. As a content creator, you can focus exclusively on shooting new materials.">Если ты не знаешь иностранных языков, ничего страшного. В команде OWN AGENCY Agency есть профессионалы-секстеры, которые ведут переписку. Ты, как создатель контента, можешь заниматься исключительно съёмками новых материалов.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- -- SOCIAL -- -->
+<section id="social" class="soc-section">
+  <div class="container">
+    <h2 class="rv" data-ru="Больше <span class='blue'>о жизни агентства</span>" data-en="More <span class='blue'>about agency life</span>">Больше <span class="blue">о жизни агентства</span></h2>
+    <p class="soc-sub rv" data-ru="Узнаешь из наших социальных сетей" data-en="Find out from our social media">Узнаешь из наших социальных сетей</p>
+    <div class="soc-grid">
+      <div class="soc-card rv">
+        <div class="soc-thumb"><img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&q=80&fit=crop" alt="TikTok" loading="lazy"></div>
+        <div class="soc-handle"><div class="sico-tt"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.78 1.53V6.84a4.84 4.84 0 0 1-1.02-.15z"/></svg></div>@titokchannel</div>
+      </div>
+      <div class="soc-card rv">
+        <div class="soc-thumb"><img src="https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=500&q=80&fit=crop" alt="Instagram" loading="lazy"></div>
+        <div class="soc-handle"><div class="sico-ig"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></div>@instagramchannel</div>
+      </div>
+      <div class="soc-card rv">
+        <div class="soc-thumb"><img src="https://images.unsplash.com/photo-1542744094-3a31f272c490?w=500&q=80&fit=crop" alt="Telegram" loading="lazy"></div>
+        <div class="soc-handle"><div class="sico-tg"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div>@own agency_agency</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- CTA SECTION -- -->
+<section id="cta-section" style="padding:88px 0;background:var(--gray)">
+  <div class="container">
+    <div class="cta-block">
+      <div class="cta-left">
+        <h2 data-ru="Готова стать следующей ТОП-моделью Fansly/OnlyFans?" data-en="Ready to become the next TOP Fansly/OnlyFans model?">Готова стать следующей ТОП-моделью Fansly/OnlyFans?</h2>
+        <p data-ru="Отправь анкету в Telegram-бот, и наш HR-менеджер свяжется с тобой. Расскажем, как можно увеличить доходы с первого месяца. Полная конфиденциальность гарантирована. Укажи в боте:" data-en="Send your application via the Telegram bot, and our HR manager will contact you. We'll tell you how to increase income from the first month. Full confidentiality guaranteed. In the bot, specify:">Отправь анкету в Telegram-бот, и наш HR-менеджер свяжется с тобой. Расскажем, как можно увеличить доходы с первого месяца. Полная конфиденциальность гарантирована. Укажи в боте:</p>
+        <div class="cta-list">
+          <div class="cta-item"><span data-ru="● Имя" data-en="● Name">● Имя</span></div>
+          <div class="cta-item"><span data-ru="● Желаемый доход" data-en="● Desired income">● Желаемый доход</span></div>
+          <div class="cta-item"><span data-ru="● Есть ли аккаунт Fansly/OF" data-en="● Do you have a Fansly/OF account">● Есть ли аккаунт Fansly/OF</span></div>
+          <div class="cta-item"><span data-ru="● Цели" data-en="● Goals">● Цели</span></div>
+        </div>
+        <p class="cta-note" data-ru="Заполни анкету и начни путь к финансовой независимости уже сейчас!" data-en="Fill out the application and start your path to financial independence now!">Заполни анкету и начни путь к финансовой независимости уже сейчас!</p>
+        <div class="cta-guarantees">
+          <div class="cta-g"><span class="cta-g-ico">📣</span><span data-ru="100% конфиденциально" data-en="100% confidential">100% конфиденциально</span></div>
+          <div class="cta-g"><span class="cta-g-ico">🔒</span><span data-ru="Данные не передаются третьим лицам" data-en="Data is not shared with third parties">Данные не передаются третьим лицам</span></div>
+          <div class="cta-g"><span class="cta-g-ico">⚡</span><span data-ru="Быстрый ответ на сообщение" data-en="Quick response to messages">Быстрый ответ на сообщение</span></div>
+        </div>
+        <a href="https://t.me/ownagency_bot" target="_blank" class="cta-btn" style="text-decoration:none" data-ru="✈ Начать зарабатывать больше" data-en="✈ Start earning more">✈ Начать зарабатывать больше</a>
+      </div>
+      <div class="cta-right">
+        <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=700&q=85&fit=crop&crop=top" alt="Business woman" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- -- VACANCIES -- -->
+<section id="vacancies" class="vac-section">
+  <div class="container">
+    <h2 class="rv" data-ru="Вакансии <span class='blue'>агентства OWN AGENCY</span>" data-en="Vacancies at <span class='blue'>OWN AGENCY Agency</span>">Вакансии <span class="blue">агентства OWN AGENCY</span></h2>
+    <p class="vac-sub rv" data-ru="Мы всегда находимся в поиске талантов — выбери работу по душе." data-en="We are always looking for talent — choose a job you love.">Мы всегда находимся в поиске талантов — выбери работу по душе.</p>
+    <div class="vac-list">
+      <div class="vac-card rv"><h3 data-ru="Модельный скаут" data-en="Model Scout">Модельный скаут</h3><p data-ru="Оплата: сдельная и договорная — за каждую приведённую модель. 20000 ₽,..." data-en="Payment: per-model and negotiable — for each recruited model. 20000 RUB,...">Оплата: сдельная и договорная — за каждую приведённую модель. 20000 ₽,...</p><a href="vacancy-scout.html" class="vac-link" data-ru="Подробнее ›" data-en="Learn more ›">Подробнее ›</a></div>
+      <div class="vac-card rv"><h3 data-ru="Секстер" data-en="Sexter">Секстер</h3><p data-ru="График: 5 рабочих дней на выбор (2 выходных — любые) Оплата:..." data-en="Schedule: 5 working days of your choice (2 days off — any) Payment:...">График: 5 рабочих дней на выбор (2 выходных — любые) Оплата:...</p><a href="vacancy-sexter.html" class="vac-link" data-ru="Подробнее ›" data-en="Learn more ›">Подробнее ›</a></div>
+      <div class="vac-card rv"><h3 data-ru="OnlyFans-модель (девушка)" data-en="OnlyFans model (female)">OnlyFans-модель (девушка)</h3><p data-ru="Возраст: от 18 до 35 лет Обязанности: Что нужно: Приветствуется: Типажи,..." data-en="Age: 18 to 35 years old Responsibilities: Requirements: Welcome: Types,...">Возраст: от 18 до 35 лет Обязанности: Что нужно: Приветствуется: Типажи,...</p><a href="vacancy-model.html" class="vac-link" data-ru="Подробнее ›" data-en="Learn more ›">Подробнее ›</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- -- FOOTER -- -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="rv">
+        <div class="flogo"><div class="nav-dot"></div>OWN AGENCY</div>
+        <p class="flogo-desc" data-ru="OWN AGENCY Agency — помогать контент-креаторам достигать финансовой независимости, выводя их аккаунты в топ. Для нас важен персональный подход: каждая модель получает индивидуальную стратегию." data-en="OWN AGENCY Agency — helping content creators achieve financial independence by bringing their accounts to the top. We value a personal approach: each model receives an individual strategy.">OWN AGENCY Agency — помогать контент-креаторам достигать финансовой независимости, выводя их аккаунты в топ. Для нас важен персональный подход: каждая модель получает индивидуальную стратегию.</p>
+      </div>
+      <div class="fnav rv">
+        <h4 data-ru="Меню" data-en="Menu">Меню</h4>
+        <ul>
+          <li><a href="#services">OnlyFans</a></li>
+          <li><a href="#services">Fansly</a></li>
+          <li><a href="#vacancies" data-ru="Вакансии" data-en="Vacancies">Вакансии</a></li>
+          <li><a href="#faq" data-ru="Блог" data-en="Blog">Блог</a></li>
+          <li><a href="javascript:void(0)" onclick="toggleLang()" id="footerLangLink" data-ru="English" data-en="Русский">English</a></li>
+        </ul>
+      </div>
+      <div class="fcta-col rv">
+        <a href="https://t.me/ownagency_bot" target="_blank" class="fcta-btn2" style="text-decoration:none" data-ru="✈ Отправить анкету в Telegram-бот" data-en="✈ Send application via Telegram bot">✈ Отправить анкету в Telegram-бот</a>
+        <div class="fsoc-row">
+          <div class="fsoc-btn tt"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.78 1.53V6.84a4.84 4.84 0 0 1-1.02-.15z"/></svg></div>
+          <div class="fsoc-btn tg"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div>
+          <div class="fsoc-btn ig"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <div class="fbottom" data-ru="©2026 OWN AGENCY Agency. OnlyFans &amp; Fansly Агентство для моделей и креаторов" data-en="©2026 OWN AGENCY Agency. OnlyFans &amp; Fansly Agency for models and creators">©2026 OWN AGENCY Agency. OnlyFans &amp; Fansly Агентство для моделей и креаторов</div>
+  </div>
+</footer>
+
+<script>
+// -- Language Switcher --
+let currentLang = localStorage.getItem('own agency-lang') || 'ru';
+
+function switchLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('own agency-lang', lang);
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    const text = el.getAttribute('data-' + lang);
+    if (text !== null) {
+      el.innerHTML = text;
+    }
+  });
+  // Update select options
+  document.querySelectorAll('select option[data-ru]').forEach(opt => {
+    const text = opt.getAttribute('data-' + lang);
+    if (text !== null) opt.textContent = text;
+  });
+  // Update lang toggle button
+  const btn = document.getElementById('langToggle');
+  if (btn) btn.textContent = lang === 'ru' ? 'English' : 'Русский';
+  // Update HTML lang attribute
+  document.documentElement.lang = lang;
+  // Update calculator display values
+  updateCalcLabels();
+}
+
+function toggleLang() {
+  switchLang(currentLang === 'ru' ? 'en' : 'ru');
+}
+
+function updateCalcLabels() {
+  const months = parseInt(document.getElementById('c-months').value);
+  const content = parseInt(document.getElementById('c-content').value);
+  const exp = parseInt(document.getElementById('c-exp').value);
+  if (currentLang === 'en') {
+    document.getElementById('c-months-val').textContent = months + ' mo.';
+    document.getElementById('c-content-val').textContent = content + ' photos/wk';
+    document.getElementById('c-exp-val').textContent = exp + ' mo. exp.';
+  } else {
+    document.getElementById('c-months-val').textContent = months + ' мес.';
+    document.getElementById('c-content-val').textContent = content + ' фото/нед';
+    document.getElementById('c-exp-val').textContent = exp + ' мес. опыта';
+  }
+}
+
+// -- Reveal on scroll --
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vs'); } });
+}, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+document.querySelectorAll('.rv,.rv-l,.rv-r,.rv-s').forEach(el => ro.observe(el));
+
+// -- Nav scroll --
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// -- Hero image parallax --
+const heroImg = document.getElementById('heroImg');
+setTimeout(() => heroImg.classList.add('loaded'), 100);
+window.addEventListener('scroll', () => {
+  heroImg.style.transform = `translateY(${window.scrollY * 0.35}px) scale(1)`;
+});
+
+// -- Set random model count on each page load (400-600) --
+const modelEl = document.getElementById('modelCounter');
+const randomModelCount = Math.floor(Math.random() * 201) + 400;
+modelEl.dataset.target = randomModelCount;
+
+// -- Counter animation --
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.done) {
+      e.target.dataset.done = '1';
+      const el = e.target;
+      const target = +el.dataset.target;
+      const suffix = el.dataset.suffix || '';
+      let start = 0;
+      const dur = 1800;
+      const step = timestamp => {
+        if (!start) start = timestamp;
+        const prog = Math.min((timestamp - start) / dur, 1);
+        const ease = 1 - Math.pow(1 - prog, 3);
+        el.textContent = Math.round(ease * target) + suffix;
+        if (prog < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.counter-num[data-target]').forEach(el => counterObs.observe(el));
+
+// -- FAQ --
+document.querySelectorAll('.fq').forEach(q => {
+  q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+});
+
+// -- Process steps --
+function setStep(step) {
+  document.querySelectorAll('.proc-step').forEach(s => {
+    s.classList.remove('active-step');
+    s.querySelector('.proc-num').classList.replace('active', 'inactive');
+  });
+  step.classList.add('active-step');
+  step.querySelector('.proc-num').classList.replace('inactive', 'active');
+}
+
+// -- Calculator --
+let engVal = 1;
+document.querySelectorAll('.eng-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.eng-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    engVal = +btn.dataset.eng;
+    updateCalc();
+  });
+});
+
+function animateResult(el, newVal) {
+  el.style.transform = 'scale(.92)';
+  el.style.opacity = '.7';
+  setTimeout(() => {
+    el.textContent = newVal.toLocaleString('ru-RU') + ' $';
+    el.style.transform = 'scale(1)';
+    el.style.opacity = '1';
+  }, 150);
+  el.style.transition = 'transform .15s,opacity .15s';
+}
+
+function updateCalc() {
+  const income = parseFloat(document.getElementById('c-income').value) || 0;
+  const months = parseInt(document.getElementById('c-months').value);
+  const content = parseInt(document.getElementById('c-content').value);
+  const exp = parseInt(document.getElementById('c-exp').value);
+  const reddit = parseFloat(document.getElementById('c-reddit').value);
+  updateCalcLabels();
+  const cb = 1 + (content - 10) / 240 * 1.2;
+  const mb = 1 + months / 24 * 1.5;
+  const eb = 1 + exp / 24 * 0.5;
+  const result = Math.round(income * engVal * cb * mb * eb * reddit / 100) * 100;
+  animateResult(document.getElementById('c-result'), result);
+}
+['c-income','c-months','c-content','c-exp','c-reddit'].forEach(id =>
+  document.getElementById(id).addEventListener('input', updateCalc));
+updateCalc();
+
+// -- Mobile menu --
+const hb = document.getElementById('hb');
+const nl = document.querySelector('.nav-links');
+let menuOpen = false;
+hb.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  if (menuOpen) {
+    Object.assign(nl.style, { display:'flex', flexDirection:'column', position:'absolute', top:'62px', left:'0', right:'0', background:'rgba(255,255,255,.98)', padding:'16px 32px', borderBottom:'1px solid #eee', gap:'14px', zIndex:'100', boxShadow:'0 8px 24px rgba(0,0,0,.08)' });
+    hb.querySelectorAll('span')[0].style.transform = 'rotate(45deg) translate(5px,5px)';
+    hb.querySelectorAll('span')[1].style.opacity = '0';
+    hb.querySelectorAll('span')[2].style.transform = 'rotate(-45deg) translate(5px,-5px)';
+  } else {
+    nl.style.display = 'none';
+    hb.querySelectorAll('span').forEach(s => s.style.cssText = '');
+  }
+});
+
+// -- Smooth scroll --
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth' }); }
+  });
+});
+
+// -- Hover 3D tilt on plan card --
+const planCard = document.querySelector('.plan-card');
+if (planCard) {
+  planCard.addEventListener('mousemove', e => {
+    const r = planCard.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    planCard.style.transform = `perspective(1000px) rotateY(${x * 4}deg) rotateX(${-y * 3}deg)`;
+  });
+  planCard.addEventListener('mouseleave', () => {
+    planCard.style.transform = '';
+  });
+}
+
+// -- Apply saved language on load --
+if (currentLang !== 'ru') {
+  switchLang(currentLang);
+}
+</script>
+</body>
+</html>
