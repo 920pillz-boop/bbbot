@@ -25,3 +25,6 @@ WEBAPP_PORT: int = int(os.getenv("PORT") or os.getenv("WEBAPP_PORT", "8080"))
 
 # Referral bonus percent (1st level)
 REF_PERCENT: float = 5.0
+
+# Manager username (without @)
+MANAGER_USERNAME: str = os.getenv("MANAGER_USERNAME", "manager")

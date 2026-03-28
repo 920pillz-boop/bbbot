@@ -541,7 +541,10 @@ async def adm_set_status(callback: CallbackQuery, bot: Bot):
     model_tg_id = int(parts[2])
     new_status = parts[3]
 
+    old_model = await db.get_user(model_tg_id)
+    old_status = old_model["status"] if old_model else "unknown"
     await db.update_user(model_tg_id, status=new_status)
+    await db.add_status_history(model_tg_id, old_status, new_status)
 
     # Notify the model
     model = await db.get_user(model_tg_id)

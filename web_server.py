@@ -6,8 +6,10 @@ aiohttp-сервер для Telegram Mini App.
 Запускается параллельно с ботом из bot.py.
 """
 
+import csv
 import hashlib
 import hmac
+import io
 import json
 import logging
 import os
@@ -449,6 +451,192 @@ async def api_admin_assign_platform(request: web.Request) -> web.Response:
     return web.json_response({"ok": True})
 
 
+# ─── API NEW: экспорт CSV ────────────────────────────────────────────────────
+
+async def api_export_earnings_csv(request: web.Request) -> web.Response:
+    """GET /api/export/earnings/{year}/{month} — CSV для скачивания."""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    year = int(request.match_info["year"])
+    month = int(request.match_info["month"])
+
+    models = await db.get_all_models_monthly_stats(year, month)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["tg_id", "username", "full_name", "status", "month_total", "platforms"])
+
+    for m in models:
+        plats = await db.get_model_platforms(m["tg_id"])
+        plat_names = "; ".join(p["platform_name"] for p in plats)
+        writer.writerow([
+            m["tg_id"],
+            m.get("tg_username") or "",
+            m.get("full_name") or "",
+            m.get("status") or "",
+            f"{m['month_total']:.2f}",
+            plat_names,
+        ])
+
+    csv_bytes = output.getvalue().encode("utf-8-sig")
+    filename = f"earnings_{year}_{month:02d}.csv"
+    return web.Response(
+        body=csv_bytes,
+        content_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
+
+
+# ─── API NEW: отмена/удаление заработка ─────────────────────────────────────
+
+async def api_admin_cancel_earning(request: web.Request) -> web.Response:
+    """POST /api/admin/cancel-earning  body: {tg_id, platform_id, date}"""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    body = await request.json()
+    tg_id = body.get("tg_id")
+    platform_id = body.get("platform_id")
+    date_str = body.get("date")
+
+    if not all([tg_id, platform_id, date_str]):
+        return web.json_response({"error": "missing fields"}, status=400)
+
+    await db.delete_earning(int(tg_id), int(platform_id), date_str)
+
+    # Уведомить модель
+    bot = request.app.get("bot")
+    if bot:
+        try:
+            platform = await db.get_platform_by_id(int(platform_id))
+            plat_name = (platform or {}).get("name", str(platform_id))
+            display_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d.%m.%Y")
+            await bot.send_message(
+                int(tg_id),
+                f"ℹ️ Запись о заработке за <b>{display_date}</b> ({plat_name}) была отменена администратором."
+            )
+        except Exception as e:
+            logger.warning(f"Cannot notify model {tg_id} about earning cancellation: {e}")
+
+    return web.json_response({"ok": True})
+
+
+# ─── API NEW: заметки администратора ─────────────────────────────────────────
+
+async def api_admin_notes_get(request: web.Request) -> web.Response:
+    """GET /api/admin/notes/{tg_id}"""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    target_id = int(request.match_info["tg_id"])
+    notes = await db.get_admin_notes(target_id)
+    return web.json_response({
+        "notes": [
+            {"id": n["id"], "note": n["note"], "created_at": n["created_at"]}
+            for n in notes
+        ]
+    })
+
+
+async def api_admin_notes_post(request: web.Request) -> web.Response:
+    """POST /api/admin/notes/{tg_id}  body: {note}"""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    target_id = int(request.match_info["tg_id"])
+    body = await request.json()
+    note_text = body.get("note", "").strip()
+    if not note_text:
+        return web.json_response({"error": "note is empty"}, status=400)
+
+    await db.add_admin_note(target_id, note_text)
+    return web.json_response({"ok": True})
+
+
+# ─── API NEW: запросы на выплату ─────────────────────────────────────────────
+
+async def api_admin_payout_requests(request: web.Request) -> web.Response:
+    """GET /api/admin/payout-requests"""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    requests = await db.get_payout_requests(status="pending")
+    return web.json_response({
+        "requests": [
+            {
+                "id": r["id"],
+                "tg_id": r["tg_id"],
+                "username": r.get("tg_username"),
+                "full_name": r.get("full_name"),
+                "amount": r["amount"],
+                "created_at": r["created_at"],
+            }
+            for r in requests
+        ]
+    })
+
+
+async def api_admin_payout_approve(request: web.Request) -> web.Response:
+    """POST /api/admin/payout-requests/{id}/approve"""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    request_id = int(request.match_info["id"])
+    await db.update_payout_request(request_id, "approved")
+
+    # Notify model
+    bot = request.app.get("bot")
+    if bot:
+        requests_list = await db.get_payout_requests(status="approved")
+        req = next((r for r in requests_list if r["id"] == request_id), None)
+        if req:
+            try:
+                await bot.send_message(
+                    req["tg_id"],
+                    f"✅ Ваш запрос на выплату <b>{req['amount']:.2f} ₽</b> одобрен!"
+                )
+            except Exception as e:
+                logger.warning(f"Cannot notify model {req['tg_id']} about payout approval: {e}")
+
+    return web.json_response({"ok": True})
+
+
+# ─── API NEW: рассылка ───────────────────────────────────────────────────────
+
+async def api_admin_broadcast(request: web.Request) -> web.Response:
+    """POST /api/admin/broadcast  body: {message}"""
+    tg_user = get_user_from_request(request)
+    if not tg_user or not is_admin_user(tg_user):
+        return web.json_response({"error": "forbidden"}, status=403)
+
+    body = await request.json()
+    text = body.get("message", "").strip()
+    if not text:
+        return web.json_response({"error": "message is empty"}, status=400)
+
+    bot = request.app.get("bot")
+    if not bot:
+        return web.json_response({"error": "bot not available"}, status=503)
+
+    models = await db.get_all_active_models_for_summary()
+    count = 0
+    for m in models:
+        try:
+            await bot.send_message(m["tg_id"], text)
+            count += 1
+        except Exception as e:
+            logger.warning(f"Broadcast failed for {m['tg_id']}: {e}")
+
+    return web.json_response({"ok": True, "sent": count})
+
+
 # ─── STATIC FILES ───────────────────────────────────────────────────────────
 
 async def serve_index(request: web.Request) -> web.Response:
@@ -463,7 +651,7 @@ def create_app(bot=None) -> web.Application:
     if bot:
         app["bot"] = bot
 
-    # API routes
+    # API routes — existing
     app.router.add_get("/api/me", api_me)
     app.router.add_get("/api/platforms", api_platforms)
     app.router.add_post("/api/toggle-platform", api_toggle_platform)
@@ -473,6 +661,15 @@ def create_app(bot=None) -> web.Application:
     app.router.add_get("/api/admin/models", api_admin_models_list)
     app.router.add_get("/api/admin/model/{tg_id}", api_admin_model_detail)
     app.router.add_post("/api/admin/assign-platform", api_admin_assign_platform)
+
+    # API routes — new
+    app.router.add_get("/api/export/earnings/{year}/{month}", api_export_earnings_csv)
+    app.router.add_post("/api/admin/cancel-earning", api_admin_cancel_earning)
+    app.router.add_get("/api/admin/notes/{tg_id}", api_admin_notes_get)
+    app.router.add_post("/api/admin/notes/{tg_id}", api_admin_notes_post)
+    app.router.add_get("/api/admin/payout-requests", api_admin_payout_requests)
+    app.router.add_post("/api/admin/payout-requests/{id}/approve", api_admin_payout_approve)
+    app.router.add_post("/api/admin/broadcast", api_admin_broadcast)
 
     # Static
     app.router.add_get("/", serve_index)

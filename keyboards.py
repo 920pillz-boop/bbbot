@@ -44,6 +44,8 @@ def main_menu(lang: str, tg_id: int) -> ReplyKeyboardMarkup:
     builder.button(text=t(lang, "btn_channel"))
     builder.button(text="📱 Личный кабинет")
     builder.button(text=t(lang, "btn_lang"))
+    builder.button(text=t(lang, "btn_payout"))
+    builder.button(text=t(lang, "btn_write_manager"))
     if tg_id == ADMIN_CHAT_ID:
         builder.button(text=t(lang, "btn_admin"))
     builder.adjust(2)
@@ -62,7 +64,7 @@ def webapp_inline_keyboard(signed_url: str) -> InlineKeyboardMarkup:
 ANKETA_FIELDS = [
     "full_name", "height", "weight", "phone_model",
     "socials", "location", "limits", "desired_income",
-    "experience", "goals"
+    "experience", "goals", "photo_file_id"
 ]
 
 
@@ -104,6 +106,27 @@ def webapp_keyboard(lang: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
+# ─── MANAGER ─────────────────────────────────────────────────────────────────
+
+def manager_keyboard(lang: str, manager_username: str) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(
+        text=t(lang, "btn_write_manager"),
+        url=f"https://t.me/{manager_username}"
+    )
+    return builder.as_markup()
+
+
+# ─── PAYOUT ──────────────────────────────────────────────────────────────────
+
+def payout_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text=t(lang, "btn_payout_confirm"), callback_data="payout:confirm")
+    builder.button(text=t(lang, "btn_cancel"), callback_data="payout:cancel")
+    builder.adjust(2)
+    return builder.as_markup()
+
+
 # ─── ADMIN ───────────────────────────────────────────────────────────────────
 
 def admin_main_keyboard(lang: str = "ru") -> InlineKeyboardMarkup:
@@ -128,8 +151,11 @@ def admin_model_keyboard(tg_id: int, status: str, list_status: str, offset: int,
         builder.button(text=t(lang, "btn_reject"),   callback_data=f"adm:set:{tg_id}:rejected")
     builder.button(text=t(lang, "btn_back_list"),  callback_data=f"adm:list:{list_status}:{offset}")
     builder.button(text=t(lang, "btn_back_admin"), callback_data="adm:home")
+    # Notes and History buttons
+    builder.button(text="📝 Заметки",   callback_data=f"adm:notes:{tg_id}")
+    builder.button(text="📋 История",   callback_data=f"adm:history:{tg_id}")
     action_count = (1 if has_approve else 0) + (1 if has_reject else 0)
-    builder.adjust(action_count if action_count > 0 else 1, 1, 1)
+    builder.adjust(action_count if action_count > 0 else 1, 1, 1, 2)
     return builder.as_markup()
 
 

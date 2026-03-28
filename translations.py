@@ -37,6 +37,9 @@ TEXTS = {
         "btn_website":  "🌐 Наш сайт",
         "btn_admin":    "🔧 Админка",
         "btn_lang":     "🌍 Язык",
+        "btn_write_manager": "💬 Написать менеджеру",
+        "btn_payout":        "💸 Запросить выплату",
+        "btn_payout_confirm": "✅ Подтвердить",
 
         "bonus_message": (
             "🎁 <b>Ваш бонус!</b>\n\n"
@@ -67,6 +70,7 @@ TEXTS = {
             "desired_income": "Желаемый доход",
             "experience": "Опыт работы",
             "goals": "Цели",
+            "photo_file_id": "📷 Фото профиля",
         },
         "edit_field": "✏️ Введите новое значение для поля <b>{field}</b>:",
         "field_updated": "✅ Поле обновлено!",
@@ -148,6 +152,44 @@ TEXTS = {
         "btn_back_admin": "🏠 Главная админки",
         "btn_prev": "⬅️",
         "btn_next": "➡️",
+
+        # ── new v2 keys ──
+        "write_manager": "💬 Написать менеджеру",
+        "manager_link": "👤 Напишите нашему менеджеру:\n@{username}",
+        "payout_request": "💸 Запросить выплату баланса",
+        "payout_balance": (
+            "💰 Ваш реферальный баланс: <b>{balance:.2f} ₽</b>\n\n"
+            "Подтвердить запрос на выплату?"
+        ),
+        "payout_sent": "✅ Запрос на выплату отправлен!",
+        "payout_no_balance": "❌ Баланс равен нулю.",
+        "payout_confirm": "✅ Подтвердить",
+        "admin_payout_request": (
+            "💸 <b>Запрос на выплату!</b>\n\n"
+            "👤 {name}\n"
+            "🆔 <code>{tg_id}</code>\n"
+            "💰 Сумма: <b>{amount:.2f} ₽</b>"
+        ),
+        "broadcast_prompt": "📢 Введите сообщение для рассылки всем активным моделям:",
+        "broadcast_done": "✅ Рассылка отправлена {count} моделям.",
+        "weekly_summary": (
+            "📊 <b>Итоги недели</b>\n\n"
+            "💰 Заработок за прошлую неделю: <b>${week_total:.0f}</b>\n"
+            "📅 Месяц ({month_name}): <b>${month_total:.0f}</b>\n\n"
+            "Продолжайте в том же духе! 💪"
+        ),
+        "monthly_summary": (
+            "📊 <b>Итоги месяца</b>\n\n"
+            "💰 Итого за {month_name}: <b>${month_total:.0f}</b>\n"
+            "🎁 Реф. бонусы: <b>{ref_total:.2f} ₽</b>\n\n"
+            "Спасибо за работу! Новый месяц — новые возможности 🚀"
+        ),
+        "admin_reminder": "⏰ <b>Напоминание!</b>\nЕсть {count} заявок на рассмотрении дольше 24 часов.",
+        "note_added": "✅ Заметка добавлена!",
+        "notes_empty": "Заметок нет.",
+        "status_history_title": "📋 История статусов:",
+        "photo_saved": "✅ Фото сохранено!",
+        "photo_prompt": "📷 Отправьте фото для профиля:",
     },
 
     "en": {
@@ -185,6 +227,9 @@ TEXTS = {
         "btn_website":  "🌐 Our website",
         "btn_admin":    "🔧 Admin panel",
         "btn_lang":     "🌍 Language",
+        "btn_write_manager": "💬 Write to manager",
+        "btn_payout":        "💸 Request payout",
+        "btn_payout_confirm": "✅ Confirm",
 
         "bonus_message": (
             "🎁 <b>Your bonus!</b>\n\n"
@@ -214,6 +259,7 @@ TEXTS = {
             "desired_income": "Desired income",
             "experience": "Work experience",
             "goals": "Goals",
+            "photo_file_id": "📷 Profile photo",
         },
         "edit_field": "✏️ Enter new value for <b>{field}</b>:",
         "field_updated": "✅ Field updated!",
@@ -292,6 +338,44 @@ TEXTS = {
         "btn_back_admin": "🏠 Admin home",
         "btn_prev": "⬅️",
         "btn_next": "➡️",
+
+        # ── new v2 keys ──
+        "write_manager": "💬 Write to manager",
+        "manager_link": "👤 Write to our manager:\n@{username}",
+        "payout_request": "💸 Request balance payout",
+        "payout_balance": (
+            "💰 Your referral balance: <b>{balance:.2f} ₽</b>\n\n"
+            "Confirm payout request?"
+        ),
+        "payout_sent": "✅ Payout request sent!",
+        "payout_no_balance": "❌ Balance is zero.",
+        "payout_confirm": "✅ Confirm",
+        "admin_payout_request": (
+            "💸 <b>Payout request!</b>\n\n"
+            "👤 {name}\n"
+            "🆔 <code>{tg_id}</code>\n"
+            "💰 Amount: <b>{amount:.2f} ₽</b>"
+        ),
+        "broadcast_prompt": "📢 Enter the message to broadcast to all active models:",
+        "broadcast_done": "✅ Broadcast sent to {count} models.",
+        "weekly_summary": (
+            "📊 <b>Weekly summary</b>\n\n"
+            "💰 Earnings last week: <b>${week_total:.0f}</b>\n"
+            "📅 Month ({month_name}): <b>${month_total:.0f}</b>\n\n"
+            "Keep it up! 💪"
+        ),
+        "monthly_summary": (
+            "📊 <b>Monthly summary</b>\n\n"
+            "💰 Total for {month_name}: <b>${month_total:.0f}</b>\n"
+            "🎁 Referral bonuses: <b>{ref_total:.2f} ₽</b>\n\n"
+            "Thank you for your work! New month, new opportunities 🚀"
+        ),
+        "admin_reminder": "⏰ <b>Reminder!</b>\nThere are {count} applications under review for more than 24 hours.",
+        "note_added": "✅ Note added!",
+        "notes_empty": "No notes.",
+        "status_history_title": "📋 Status history:",
+        "photo_saved": "✅ Photo saved!",
+        "photo_prompt": "📷 Send a photo for your profile:",
     }
 }
 

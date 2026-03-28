@@ -110,6 +110,46 @@ async def init_db():
             )
         """)
 
+        # ── Новые таблицы v2 ──────────────────────────────────────────────
+
+        # История изменений статуса
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS status_history (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                tg_id      INTEGER NOT NULL,
+                old_status TEXT,
+                new_status TEXT,
+                changed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Заметки администратора
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS admin_notes (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                tg_id      INTEGER NOT NULL,
+                note       TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Запросы на выплату
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS payout_requests (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                tg_id      INTEGER NOT NULL,
+                amount     REAL NOT NULL,
+                status     TEXT DEFAULT 'pending',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Добавляем photo_file_id в anketa если колонки ещё нет
+        try:
+            await db.execute("ALTER TABLE anketa ADD COLUMN photo_file_id TEXT")
+        except Exception:
+            pass  # Колонка уже существует
+
         await db.commit()
 
 
@@ -479,5 +519,134 @@ async def get_all_models_for_admin() -> list[dict]:
                 END,
                 u.income DESC
         """) as cur:
+            rows = await cur.fetchall()
+            return [dict(r) for r in rows]
+
+
+# ─── НОВОЕ v2: STATUS HISTORY ─────────────────────────────────────────────────
+
+async def add_status_history(tg_id: int, old_status: str | None, new_status: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "INSERT INTO status_history (tg_id, old_status, new_status) VALUES (?,?,?)",
+            (tg_id, old_status, new_status)
+        )
+        await db.commit()
+
+
+async def get_status_history(tg_id: int, limit: int = 5) -> list[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM status_history WHERE tg_id=? ORDER BY changed_at DESC LIMIT ?",
+            (tg_id, limit)
+        ) as cur:
+            rows = await cur.fetchall()
+            return [dict(r) for r in rows]
+
+
+# ─── НОВОЕ v2: ADMIN NOTES ────────────────────────────────────────────────────
+
+async def add_admin_note(tg_id: int, note: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "INSERT INTO admin_notes (tg_id, note) VALUES (?,?)",
+            (tg_id, note)
+        )
+        await db.commit()
+
+
+async def get_admin_notes(tg_id: int) -> list[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM admin_notes WHERE tg_id=? ORDER BY created_at DESC",
+            (tg_id,)
+        ) as cur:
+            rows = await cur.fetchall()
+            return [dict(r) for r in rows]
+
+
+# ─── НОВОЕ v2: PAYOUT REQUESTS ────────────────────────────────────────────────
+
+async def create_payout_request(tg_id: int, amount: float) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "INSERT INTO payout_requests (tg_id, amount) VALUES (?,?)",
+            (tg_id, amount)
+        )
+        await db.commit()
+        return cur.lastrowid
+
+
+async def get_payout_requests(status: str = "pending") -> list[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT pr.*, u.tg_username, a.full_name "
+            "FROM payout_requests pr "
+            "LEFT JOIN users u ON u.tg_id = pr.tg_id "
+            "LEFT JOIN anketa a ON a.tg_id = pr.tg_id "
+            "WHERE pr.status=? ORDER BY pr.created_at DESC",
+            (status,)
+        ) as cur:
+            rows = await cur.fetchall()
+            return [dict(r) for r in rows]
+
+
+async def update_payout_request(request_id: int, status: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE payout_requests SET status=? WHERE id=?",
+            (status, request_id)
+        )
+        await db.commit()
+
+
+# ─── НОВОЕ v2: DELETE EARNING ─────────────────────────────────────────────────
+
+async def delete_earning(tg_id: int, platform_id: int, date_str: str):
+    """Удаляет запись о заработке и пересчитывает суммарный доход модели."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "DELETE FROM daily_earnings WHERE tg_id=? AND platform_id=? AND date=?",
+            (tg_id, platform_id, date_str)
+        )
+        # Пересчитываем суммарный доход
+        async with db.execute(
+            "SELECT COALESCE(SUM(amount), 0) FROM daily_earnings WHERE tg_id=?", (tg_id,)
+        ) as cur:
+            row = await cur.fetchone()
+            total = float(row[0]) if row else 0.0
+        await db.execute("UPDATE users SET income=? WHERE tg_id=?", (total, tg_id))
+        await db.commit()
+
+
+# ─── НОВОЕ v2: REVIEWING USERS OLDER THAN N HOURS ────────────────────────────
+
+async def get_reviewing_users_older_than(hours: int = 24) -> list[dict]:
+    """Пользователи со статусом 'reviewing', у которых анкета подана более N часов назад."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute("""
+            SELECT u.tg_id, u.tg_username, u.created_at, a.full_name
+            FROM users u
+            LEFT JOIN anketa a ON a.tg_id = u.tg_id
+            WHERE u.status = 'reviewing'
+              AND u.created_at <= datetime('now', ? || ' hours')
+        """, (f"-{hours}",)) as cur:
+            rows = await cur.fetchall()
+            return [dict(r) for r in rows]
+
+
+# ─── НОВОЕ v2: ALL ACTIVE MODELS FOR SUMMARY ─────────────────────────────────
+
+async def get_all_active_models_for_summary() -> list[dict]:
+    """Все активные модели — tg_id и язык — для рассылки итогов."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT tg_id, language FROM users WHERE status='active'",
+        ) as cur:
             rows = await cur.fetchall()
             return [dict(r) for r in rows]
