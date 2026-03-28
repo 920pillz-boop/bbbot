@@ -262,6 +262,9 @@ async def menu_profile(message: Message, state: FSMContext):
     tg_id = message.from_user.id
     lang = await get_lang(tg_id)
     user = await db.get_user(tg_id)
+    if not user:
+        await message.answer("Нажмите /start для начала работы.")
+        return
     anketa = await db.get_anketa(tg_id) or {}
     text = build_profile_text(lang, anketa, user["status"])
     await message.answer(text, reply_markup=profile_edit_keyboard(lang))
@@ -338,6 +341,9 @@ async def menu_referrals(message: Message):
     tg_id = message.from_user.id
     lang = await get_lang(tg_id)
     user = await db.get_user(tg_id)
+    if not user:
+        await message.answer("Нажмите /start для начала работы.")
+        return
     refs = await db.get_referrals(tg_id)
     bonuses = await db.get_ref_bonuses(tg_id)
 
