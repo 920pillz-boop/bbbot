@@ -60,36 +60,37 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif
 .field-label { font-size:12px; color:var(--hint); flex-shrink:0; }
 .field-value { font-size:13px; text-align:right; word-break:break-word; max-width:65%; }
 
-/* ── EARNINGS GRID ── */
-.month-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-.nav-btn { background:var(--bg2); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:10px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.month-label { font-size:16px; font-weight:700; }
+/* ── EARNINGS CALENDAR ── */
+.earn-stats { display:flex; gap:8px; margin-bottom:14px; }
+.earn-stat { flex:1; background:var(--bg2); border-radius:10px; padding:10px; text-align:center; }
+.earn-stat-val { font-size:17px; font-weight:700; color:var(--green); }
+.earn-stat-lbl { font-size:10px; color:var(--hint); margin-top:2px; }
 
-.earn-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-.earn-grid { border-collapse:collapse; width:100%; min-width:320px; font-size:13px; }
-.earn-grid th {
-  padding:8px 10px; text-align:right; white-space:nowrap;
-  font-size:11px; font-weight:600; color:var(--hint);
-  border-bottom:2px solid var(--border); position:sticky; top:0;
-  background:var(--bg2);
-}
-.earn-grid th:first-child { text-align:left; }
-.earn-grid td { padding:7px 10px; text-align:right; border-bottom:1px solid var(--border); white-space:nowrap; }
-.earn-grid td:first-child { text-align:left; color:var(--hint); font-size:12px; }
-.earn-grid .td-empty { color:var(--border); }
-.earn-grid .td-amount { color:var(--text); font-weight:500; }
-.earn-grid .td-ref { color:var(--gold); font-weight:500; }
-.earn-grid .td-total { font-weight:700; color:var(--btn); }
-.earn-grid .row-total td { border-top:2px solid var(--border); border-bottom:none; font-weight:700; }
-.earn-grid .row-total td:first-child { color:var(--text); }
+.plat-badges { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.plat-badge { display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:500; background:var(--bg2); border:1px solid var(--border); }
+.plat-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
-.plat-header { display:flex; align-items:center; gap:6px; }
-.plat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.month-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.nav-btn { background:var(--bg2); border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:10px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.month-label { font-size:17px; font-weight:700; }
 
-.compare-row { display:flex; gap:8px; margin-top:10px; }
-.cmp { flex:1; background:var(--bg2); border-radius:10px; padding:12px; text-align:center; }
-.cmp-val { font-size:18px; font-weight:700; }
-.cmp-lbl { font-size:10px; color:var(--hint); margin-top:2px; }
+.cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:3px; }
+.cal-weekday { text-align:center; font-size:11px; color:var(--hint); font-weight:500; padding:4px 0; }
+
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-cell { background:var(--bg2); border-radius:8px; padding:6px 5px 5px; min-height:62px; position:relative; }
+.cal-cell.empty { background:transparent; }
+.cal-cell.today { border:1px solid var(--btn); }
+.cal-day-num { font-size:11px; color:var(--hint); font-weight:500; margin-bottom:3px; }
+.cal-amount { font-size:13px; font-weight:700; color:var(--text); line-height:1.2; }
+.cal-amount.has-data { color:var(--green); }
+.cal-bars { display:flex; gap:2px; margin-top:4px; flex-wrap:wrap; }
+.cal-bar { height:3px; border-radius:2px; flex:1; min-width:4px; }
+.cal-ref-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); margin-top:3px; }
+
+.plat-legend { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; justify-content:center; }
+.legend-item { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--hint); }
+.legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 
 /* ── ADMIN MODELS LIST ── */
 .filter-row { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
@@ -167,6 +168,7 @@ tg.ready(); tg.expand();
 // ─── Auth: initData OR signed URL params ───────────────────────────────────
 const AUTH = tg.initData;
 const UP = new URLSearchParams(window.location.search);
+const API_URL = UP.get('api') || '';
 const SIGNED = { tg_id: UP.get('tg_id'), user: UP.get('user')||'', adm: UP.get('adm')||'0', ts: UP.get('ts')||'', sig: UP.get('sig')||'' };
 const HAS_SIGNED = !!(SIGNED.tg_id && SIGNED.sig);
 
@@ -181,7 +183,7 @@ async function api(path, opts={}) {
   const hdrs = { 'Content-Type':'application/json' };
   if (AUTH) hdrs['Authorization'] = AUTH;
   if (HAS_SIGNED) { hdrs['X-TG-ID']=SIGNED.tg_id; hdrs['X-TG-User']=SIGNED.user; hdrs['X-TG-Admin']=SIGNED.adm; hdrs['X-TG-TS']=SIGNED.ts; hdrs['X-TG-Sig']=SIGNED.sig; }
-  const res = await fetch(path, { ...opts, headers:{...hdrs,...(opts.headers||{})} });
+  const res = await fetch(API_URL + path, { ...opts, headers:{...hdrs,...(opts.headers||{})} });
   return res.json();
 }
 
@@ -249,7 +251,7 @@ function renderProfile(data) {
   `;
 }
 
-// ─── EARNINGS GRID ─────────────────────────────────────────────────────────
+// ─── EARNINGS CALENDAR ─────────────────────────────────────────────────────
 async function loadEarnings(targetId) {
   const page = document.getElementById('page-earnings');
   page.innerHTML = '<div class="spinner"></div>';
@@ -258,12 +260,11 @@ async function loadEarnings(targetId) {
   const url = `/api/earnings/${state.year}/${state.month}` + (tid ? `?tg_id=${tid}` : '');
   const data = await api(url);
 
-  // Площадки модели — берём из профиля или из entries
+  // Площадки: из профиля или из entries
   let plats = [];
   if (!targetId && state.profile) {
     plats = state.profile.platforms || [];
   } else {
-    // Уникальные площадки из entries
     const seen = {};
     (data.entries||[]).forEach(e => {
       if (!seen[e.platform_id]) seen[e.platform_id] = { id:e.platform_id, name:e.platform, color:e.color };
@@ -271,7 +272,7 @@ async function loadEarnings(targetId) {
     plats = Object.values(seen);
   }
 
-  const days = daysInMonth(state.year, state.month);
+  // Карты данных по дням
   const entryMap = {}; // {day: {platform_id: amount}}
   (data.entries||[]).forEach(e => {
     const day = parseInt(e.date.split('-')[2]);
@@ -283,73 +284,72 @@ async function loadEarnings(targetId) {
     refMap[parseInt(dt.split('-')[2])] = amt;
   });
 
-  // Колонки итогов
+  // Итоги
   const platTotals = {};
   plats.forEach(p => { platTotals[p.id] = 0; });
-  let refColTotal = 0;
+  let refTotal = 0;
+  const days = daysInMonth(state.year, state.month);
+  for (let d = 1; d <= days; d++) {
+    plats.forEach(p => { if (entryMap[d]?.[p.id]) platTotals[p.id] += entryMap[d][p.id]; });
+    if (refMap[d]) refTotal += refMap[d];
+  }
+  const grandTotal = Object.values(platTotals).reduce((a,b)=>a+b,0) + refTotal;
 
-  // Строки таблицы (только дни с данными или все — показываем все)
-  let rows = '';
+  // Первый день недели (0=Вс..6=Сб → переводим в Пн=0)
+  const firstDow = (new Date(state.year, state.month-1, 1).getDay() + 6) % 7;
+  const today = new Date();
+  const isThisMonth = today.getFullYear()===state.year && today.getMonth()+1===state.month;
+
+  // Календарные ячейки
+  let cells = '';
+  for (let i = 0; i < firstDow; i++) cells += `<div class="cal-cell empty"></div>`;
   for (let d = 1; d <= days; d++) {
     const dayData = entryMap[d] || {};
     const refAmt = refMap[d] || 0;
     let dayTotal = 0;
-    let hasSomething = false;
-
-    let cells = plats.map(p => {
-      const amt = dayData[p.id] || 0;
-      if (amt) { platTotals[p.id] += amt; dayTotal += amt; hasSomething = true; }
-      return amt
-        ? `<td class="td-amount">$${amt.toFixed(0)}</td>`
-        : `<td class="td-empty">—</td>`;
-    }).join('');
-
-    if (refAmt) { refColTotal += refAmt; dayTotal += refAmt; hasSomething = true; }
-    const refCell = refAmt ? `<td class="td-ref">$${refAmt.toFixed(0)}</td>` : `<td class="td-empty">—</td>`;
-
-    if (!hasSomething) continue; // пропускаем пустые дни
-
-    const dateStr = `${String(d).padStart(2,'0')}.${String(state.month).padStart(2,'0')}`;
-    rows += `<tr><td>${dateStr}</td>${cells}${refCell}<td class="td-total">$${dayTotal.toFixed(0)}</td></tr>`;
+    plats.forEach(p => { if (dayData[p.id]) dayTotal += dayData[p.id]; });
+    if (refAmt) dayTotal += refAmt;
+    const isToday = isThisMonth && today.getDate()===d;
+    const bars = plats.filter(p => dayData[p.id]).map(p =>
+      `<div class="cal-bar" style="background:${p.color}"></div>`
+    ).join('');
+    const refDot = refAmt ? `<div class="cal-ref-dot"></div>` : '';
+    cells += `
+      <div class="cal-cell${isToday?' today':''}">
+        <div class="cal-day-num">${d}</div>
+        ${dayTotal > 0 ? `<div class="cal-amount has-data">$${dayTotal.toFixed(0)}</div>` : ''}
+        <div class="cal-bars">${bars}${refDot}</div>
+      </div>`;
   }
 
-  if (!rows) rows = `<tr><td colspan="${plats.length+3}" style="text-align:center;padding:20px;color:var(--hint)">Нет данных</td></tr>`;
+  // Легенда площадок
+  const legend = plats.map(p =>
+    `<div class="legend-item"><span class="legend-dot" style="background:${p.color}"></span>${p.name}</div>`
+  ).join('') + (refTotal > 0 ? `<div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Реф.бонус</div>` : '');
 
-  const grandTotal = Object.values(platTotals).reduce((a,b)=>a+b,0) + refColTotal;
-
-  const headers = plats.map(p =>
-    `<th><div class="plat-header"><span class="plat-dot" style="background:${p.color}"></span>${p.name}</div></th>`
-  ).join('');
-  const footers = plats.map(p =>
-    `<td class="td-amount">$${(platTotals[p.id]||0).toFixed(0)}</td>`
-  ).join('');
-
-  const pm = state.month>1 ? state.month-1 : 12;
-  const py = state.month>1 ? state.year : state.year-1;
   const diff = (data.total||0) - (data.prev_total||0);
-  const diffSign = diff>=0 ? '+' : '';
-  const diffColor = diff>=0 ? 'var(--green)' : 'var(--red)';
+  const diffSign = diff >= 0 ? '+' : '';
+  const diffColor = diff >= 0 ? 'var(--green)' : 'var(--red)';
 
   page.innerHTML = `
+    <div class="earn-stats">
+      <div class="earn-stat"><div class="earn-stat-val">$${(data.total||0).toFixed(0)}</div><div class="earn-stat-lbl">Этот месяц</div></div>
+      <div class="earn-stat"><div class="earn-stat-val" style="color:var(--hint)">$${(data.prev_total||0).toFixed(0)}</div><div class="earn-stat-lbl">Прошлый</div></div>
+      <div class="earn-stat"><div class="earn-stat-val" style="color:${diffColor}">${diffSign}$${Math.abs(diff).toFixed(0)}</div><div class="earn-stat-lbl">Разница</div></div>
+    </div>
     <div class="month-nav">
-      <button class="nav-btn" id="ep">&lt;</button>
+      <button class="nav-btn" id="ep">&#8249;</button>
       <span class="month-label">${MONTHS[state.month-1]} ${state.year}</span>
-      <button class="nav-btn" id="en">&gt;</button>
+      <button class="nav-btn" id="en">&#8250;</button>
     </div>
-    <div class="card" style="padding:0 0 0 0">
-      <div class="earn-wrap">
-        <table class="earn-grid">
-          <thead><tr><th>Дата</th>${headers}<th>Реф.бонус</th><th>Итого</th></tr></thead>
-          <tbody>${rows}</tbody>
-          <tfoot><tr class="row-total"><td>Итого</td>${footers}<td class="td-ref">$${refColTotal.toFixed(0)}</td><td class="td-total">$${grandTotal.toFixed(0)}</td></tr></tfoot>
-        </table>
-      </div>
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Пн</div><div class="cal-weekday">Вт</div><div class="cal-weekday">Ср</div>
+      <div class="cal-weekday">Чт</div><div class="cal-weekday">Пт</div>
+      <div class="cal-weekday" style="color:var(--btn)">Сб</div>
+      <div class="cal-weekday" style="color:var(--red)">Вс</div>
     </div>
-    <div class="compare-row">
-      <div class="cmp"><div class="cmp-val">$${(data.total||0).toFixed(0)}</div><div class="cmp-lbl">Текущий</div></div>
-      <div class="cmp"><div class="cmp-val">$${(data.prev_total||0).toFixed(0)}</div><div class="cmp-lbl">Прошлый</div></div>
-      <div class="cmp"><div class="cmp-val" style="color:${diffColor}">${diffSign}$${Math.abs(diff).toFixed(0)}</div><div class="cmp-lbl">Разница</div></div>
-    </div>`;
+    <div class="cal-grid">${cells}</div>
+    <div class="plat-legend">${legend}</div>`;
 
   document.getElementById('ep').onclick = () => { navMonth(-1); loadEarnings(targetId); };
   document.getElementById('en').onclick = () => { navMonth(1); loadEarnings(targetId); };
@@ -447,7 +447,7 @@ async function openModelDetail(tgId) {
     </div>`
   ).join('');
 
-  // Сетка доходов (compact)
+  // Календарь доходов для профиля модели (admin)
   const plats = det.platforms.filter(p=>p.assigned);
   const days = daysInMonth(state.year, state.month);
   const eMap = {};
@@ -459,20 +459,26 @@ async function openModelDetail(tgId) {
   const rMap = {};
   Object.entries(earData.ref_bonuses||{}).forEach(([dt,amt])=>{ rMap[parseInt(dt.split('-')[2])]=amt; });
 
-  let gridRows='', platTots={}, refTot=0;
-  plats.forEach(p=>{ platTots[p.id]=0; });
-  for (let d=1;d<=days;d++) {
-    const dd=eMap[d]||{}; const ra=rMap[d]||0; let dt=0; let has=false;
-    let cells=plats.map(p=>{ const a=dd[p.id]||0; if(a){platTots[p.id]+=a;dt+=a;has=true;} return a?`<td class="td-amount">$${a.toFixed(0)}</td>`:`<td class="td-empty">—</td>`; }).join('');
-    if(ra){refTot+=ra;dt+=ra;has=true;}
-    const rc=ra?`<td class="td-ref">$${ra.toFixed(0)}</td>`:`<td class="td-empty">—</td>`;
-    if(!has) continue;
-    gridRows+=`<tr><td>${String(d).padStart(2,'0')}</td>${cells}${rc}<td class="td-total">$${dt.toFixed(0)}</td></tr>`;
+  let refTot=0, monthTotal=0;
+  for(let d=1;d<=days;d++){
+    plats.forEach(p=>{ if(eMap[d]?.[p.id]) monthTotal+=eMap[d][p.id]; });
+    if(rMap[d]) refTot+=rMap[d];
   }
-  if(!gridRows) gridRows=`<tr><td colspan="${plats.length+3}" style="text-align:center;padding:16px;color:var(--hint)">Нет данных</td></tr>`;
-  const gTotal=Object.values(platTots).reduce((a,b)=>a+b,0)+refTot;
-  const heads=plats.map(p=>`<th><div class="plat-header"><span class="plat-dot" style="background:${p.color}"></span>${p.name}</div></th>`).join('');
-  const foots=plats.map(p=>`<td class="td-amount">$${(platTots[p.id]||0).toFixed(0)}</td>`).join('');
+  monthTotal+=refTot;
+
+  const firstDow = (new Date(state.year, state.month-1, 1).getDay()+6)%7;
+  let calCells='';
+  for(let i=0;i<firstDow;i++) calCells+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=days;d++){
+    const dd=eMap[d]||{}; const ra=rMap[d]||0;
+    let dayTotal=0;
+    plats.forEach(p=>{ if(dd[p.id]) dayTotal+=dd[p.id]; });
+    if(ra) dayTotal+=ra;
+    const bars=plats.filter(p=>dd[p.id]).map(p=>`<div class="cal-bar" style="background:${p.color}"></div>`).join('');
+    const refDot=ra?`<div class="cal-ref-dot"></div>`:'';
+    calCells+=`<div class="cal-cell"><div class="cal-day-num">${d}</div>${dayTotal>0?`<div class="cal-amount has-data">$${dayTotal.toFixed(0)}</div>`:''}<div class="cal-bars">${bars}${refDot}</div></div>`;
+  }
+  const calLegend=plats.map(p=>`<div class="legend-item"><span class="legend-dot" style="background:${p.color}"></span>${p.name}</div>`).join('')+(refTot>0?`<div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Реф.бонус</div>`:'');
 
   page.innerHTML = `
     <div class="back-btn" id="back-to-models">← Все модели</div>
@@ -498,22 +504,25 @@ async function openModelDetail(tgId) {
       <div class="plat-assign-grid">${platCards||'<div style="color:var(--hint);font-size:13px">Нет площадок</div>'}</div>
     </div>
 
-    <div class="card" style="padding:0">
-      <div style="padding:14px 14px 8px">
-        <div class="card-title">Доходы — ${MONTHS[state.month-1]} ${state.year}</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <button class="nav-btn" id="dp">&lt;</button>
-          <span style="flex:1;text-align:center;line-height:38px;font-weight:600">${MONTHS[state.month-1]} ${state.year}</span>
-          <button class="nav-btn" id="dn">&gt;</button>
-        </div>
+    <div class="card">
+      <div class="card-title">Доходы</div>
+      <div class="earn-stats" style="margin-bottom:12px">
+        <div class="earn-stat"><div class="earn-stat-val">$${monthTotal.toFixed(0)}</div><div class="earn-stat-lbl">За месяц</div></div>
+        <div class="earn-stat"><div class="earn-stat-val" style="color:var(--gold)">$${refTot.toFixed(0)}</div><div class="earn-stat-lbl">Реф.бонус</div></div>
       </div>
-      <div class="earn-wrap">
-        <table class="earn-grid">
-          <thead><tr><th>День</th>${heads}<th>Реф.</th><th>Итого</th></tr></thead>
-          <tbody>${gridRows}</tbody>
-          <tfoot><tr class="row-total"><td>∑</td>${foots}<td class="td-ref">$${refTot.toFixed(0)}</td><td class="td-total">$${gTotal.toFixed(0)}</td></tr></tfoot>
-        </table>
+      <div class="month-nav" style="margin-bottom:10px">
+        <button class="nav-btn" id="dp">&#8249;</button>
+        <span style="font-size:15px;font-weight:700">${MONTHS[state.month-1]} ${state.year}</span>
+        <button class="nav-btn" id="dn">&#8250;</button>
       </div>
+      <div class="cal-weekdays">
+        <div class="cal-weekday">Пн</div><div class="cal-weekday">Вт</div><div class="cal-weekday">Ср</div>
+        <div class="cal-weekday">Чт</div><div class="cal-weekday">Пт</div>
+        <div class="cal-weekday" style="color:var(--btn)">Сб</div>
+        <div class="cal-weekday" style="color:var(--red)">Вс</div>
+      </div>
+      <div class="cal-grid">${calCells}</div>
+      <div class="plat-legend">${calLegend}</div>
     </div>
 
     <div class="card">

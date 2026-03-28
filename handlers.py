@@ -237,13 +237,16 @@ async def form_answer(message: Message, state: FSMContext, bot: Bot):
 
         # Notify admin
         anketa = await db.get_anketa(tg_id)
-        await bot.send_message(
-            ADMIN_CHAT_ID,
-            t("ru", "admin_new_anketa",
-              name=anketa.get("full_name") or "—",
-              tg_id=tg_id,
-              username=message.from_user.username or "—")
-        )
+        try:
+            await bot.send_message(
+                ADMIN_CHAT_ID,
+                t("ru", "admin_new_anketa",
+                  name=anketa.get("full_name") or "—",
+                  tg_id=tg_id,
+                  username=message.from_user.username or "—")
+            )
+        except Exception as e:
+            logger.warning(f"Cannot notify admin about new anketa {tg_id}: {e}")
 
         await message.answer(
             t(lang, "form_done"),
