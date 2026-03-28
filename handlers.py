@@ -555,17 +555,22 @@ async def adm_view(callback: CallbackQuery):
         await callback.answer("Пользователь не найден")
         return
 
-    # Если у модели есть фото — показываем его отдельным сообщением
-    photo_id = (anketa or {}).get("photo_file_id")
-    if photo_id:
-        try:
-            await callback.message.answer_photo(photo=photo_id, caption="📷 Фото профиля")
-        except Exception:
-            pass
-
     text = build_model_card("ru", user, anketa, len(refs))
     kb = admin_model_keyboard(model_tg_id, user["status"], list_status, offset)
-    await callback.message.edit_text(text, reply_markup=kb)
+    photo_id = (anketa or {}).get("photo_file_id")
+
+    if photo_id:
+        # Удаляем текущее сообщение и отправляем фото с текстом в одном сообщении
+        try:
+            await callback.message.delete()
+        except Exception:
+            pass
+        try:
+            await callback.message.answer_photo(photo=photo_id, caption=text, reply_markup=kb)
+        except Exception:
+            await callback.message.answer(text, reply_markup=kb)
+    else:
+        await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 
 
@@ -606,5 +611,12 @@ async def adm_set_status(callback: CallbackQuery, bot: Bot):
     refs = await db.get_referrals(model_tg_id)
     text = build_model_card("ru", await db.get_user(model_tg_id), anketa, len(refs))
     kb = admin_model_keyboard(model_tg_id, new_status, "all", 0)
-    await callback.message.edit_text(text, reply_markup=kb)
+    # Если текущее сообщение — фото (с caption), редактируем caption; иначе text
+    if callback.message.photo:
+        try:
+            await callback.message.edit_caption(caption=text, reply_markup=kb)
+        except Exception:
+            await callback.message.answer(text, reply_markup=kb)
+    else:
+        await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer(f"✅ Статус изменён на: {new_status}")
