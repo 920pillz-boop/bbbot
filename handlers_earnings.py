@@ -48,10 +48,12 @@ def current_ym() -> tuple[int, int]:
     return now.year, now.month
 
 
-def month_name(month: int) -> str:
-    names = ["Январь","Февраль","Март","Апрель","Май","Июнь",
-             "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    return names[month - 1]
+def month_name(month: int, lang: str = "ru") -> str:
+    names_ru = ["Январь","Февраль","Март","Апрель","Май","Июнь",
+                "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
+    names_en = ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"]
+    return (names_ru if lang == "ru" else names_en)[month - 1]
 
 
 def build_calendar_text(earnings: list[dict], year: int, month: int, month_total: float) -> str:

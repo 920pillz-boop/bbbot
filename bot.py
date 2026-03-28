@@ -19,7 +19,7 @@ from database import (
     get_earnings_for_month,
 )
 from handlers import router
-from handlers_earnings import router as earnings_router
+from handlers_earnings import router as earnings_router, month_name as _month_name
 from handlers_new import router as new_router
 from web_server import start_web_server
 
@@ -47,18 +47,6 @@ def get_proxy() -> str | None:
             return val
     return None
 
-
-def _month_name(month: int, lang: str = "ru") -> str:
-    names_ru = [
-        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
-    ]
-    names_en = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ]
-    names = names_ru if lang == "ru" else names_en
-    return names[month - 1]
 
 
 # ─── BACKGROUND TASK: weekly/monthly summary ─────────────────────────────────
