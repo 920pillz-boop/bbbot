@@ -260,16 +260,16 @@ async function loadEarnings(targetId) {
   const url = `/api/earnings/${state.year}/${state.month}` + (tid ? `?tg_id=${tid}` : '');
   const data = await api(url);
 
-  // Площадки: из профиля или из entries
-  let plats = [];
-  if (!targetId && state.profile) {
+  // Площадки: всегда из entries (достоверные данные), + из профиля для цветов если нет earnings
+  const seenPlats = {};
+  (data.entries||[]).forEach(e => {
+    if (!seenPlats[e.platform_id])
+      seenPlats[e.platform_id] = { id: e.platform_id, name: e.platform, color: e.color };
+  });
+  let plats = Object.values(seenPlats);
+  // Если данных нет за этот месяц — берём назначенные площадки для легенды
+  if (plats.length === 0 && !targetId && state.profile) {
     plats = state.profile.platforms || [];
-  } else {
-    const seen = {};
-    (data.entries||[]).forEach(e => {
-      if (!seen[e.platform_id]) seen[e.platform_id] = { id:e.platform_id, name:e.platform, color:e.color };
-    });
-    plats = Object.values(seen);
   }
 
   // Карты данных по дням
@@ -331,6 +331,48 @@ async function loadEarnings(targetId) {
   const diffSign = diff >= 0 ? '+' : '';
   const diffColor = diff >= 0 ? 'var(--green)' : 'var(--red)';
 
+  // ── Детальная таблица по дням ──────────────────────────────────────────────
+  const sortedDays = Object.keys(entryMap).map(Number).sort((a,b)=>a-b);
+  let detailRows = '';
+  for (const d of sortedDays) {
+    const dayData = entryMap[d] || {};
+    const refAmt = refMap[d] || 0;
+    const platLines = plats
+      .filter(p => dayData[p.id])
+      .map(p => `<span style="color:${p.color};margin-right:10px">● ${p.name}: <b>$${dayData[p.id].toFixed(0)}</b></span>`)
+      .join('');
+    const refLine = refAmt ? `<span style="color:var(--gold);margin-right:10px">● Реф.бонус: <b>$${refAmt.toFixed(0)}</b></span>` : '';
+    let dayTotal = 0;
+    plats.forEach(p => { if(dayData[p.id]) dayTotal += dayData[p.id]; });
+    if(refAmt) dayTotal += refAmt;
+    detailRows += `
+      <div style="padding:9px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-weight:700;font-size:14px">${d} ${MONTHS[state.month-1].slice(0,3)}</span>
+          <span style="font-weight:700;color:var(--green);font-size:14px">$${dayTotal.toFixed(0)}</span>
+        </div>
+        <div style="font-size:12px">${platLines}${refLine}</div>
+      </div>`;
+  }
+  const detailSection = sortedDays.length > 0
+    ? `<div class="card" style="margin-top:12px"><div class="card-title">Детализация</div>${detailRows}</div>`
+    : '';
+
+  // ── Итоги по площадкам ─────────────────────────────────────────────────────
+  const platSummary = plats
+    .filter(p => platTotals[p.id] > 0)
+    .map(p => `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>${p.name}</span>
+      <b>$${platTotals[p.id].toFixed(0)}</b></div>`)
+    .join('');
+  const refSummaryLine = refTotal > 0
+    ? `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+        <span style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span>Реф.бонусы</span>
+        <b>$${refTotal.toFixed(0)}</b></div>` : '';
+  const platSummarySection = (platSummary || refSummaryLine)
+    ? `<div class="card" style="margin-top:12px"><div class="card-title">По площадкам</div>${platSummary}${refSummaryLine}</div>`
+    : '';
+
   page.innerHTML = `
     <div class="earn-stats">
       <div class="earn-stat"><div class="earn-stat-val">$${(data.total||0).toFixed(0)}</div><div class="earn-stat-lbl">Этот месяц</div></div>
@@ -349,7 +391,9 @@ async function loadEarnings(targetId) {
       <div class="cal-weekday" style="color:var(--red)">Вс</div>
     </div>
     <div class="cal-grid">${cells}</div>
-    <div class="plat-legend">${legend}</div>`;
+    <div class="plat-legend">${legend}</div>
+    ${platSummarySection}
+    ${detailSection}`;
 
   document.getElementById('ep').onclick = () => { navMonth(-1); loadEarnings(targetId); };
   document.getElementById('en').onclick = () => { navMonth(1); loadEarnings(targetId); };
@@ -480,6 +524,43 @@ async function openModelDetail(tgId) {
   }
   const calLegend=plats.map(p=>`<div class="legend-item"><span class="legend-dot" style="background:${p.color}"></span>${p.name}</div>`).join('')+(refTot>0?`<div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Реф.бонус</div>`:'');
 
+  // Детализация по дням (admin model detail)
+  const admSortedDays = Object.keys(eMap).map(Number).sort((a,b)=>a-b);
+  let admDetailRows = '';
+  for (const d of admSortedDays) {
+    const dd = eMap[d] || {};
+    const ra = rMap[d] || 0;
+    const platLines = plats
+      .filter(p => dd[p.id])
+      .map(p => `<span style="color:${p.color};margin-right:10px">● ${p.name}: <b>$${dd[p.id].toFixed(0)}</b></span>`)
+      .join('');
+    const refLine = ra ? `<span style="color:var(--gold);margin-right:10px">● Реф.бонус: <b>$${ra.toFixed(0)}</b></span>` : '';
+    let dayTot = ra;
+    plats.forEach(p => { if(dd[p.id]) dayTot += dd[p.id]; });
+    admDetailRows += `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-weight:700">${d} ${MONTHS[state.month-1].slice(0,3)}</span>
+          <span style="font-weight:700;color:var(--green)">$${dayTot.toFixed(0)}</span>
+        </div>
+        <div style="font-size:12px">${platLines}${refLine}</div>
+      </div>`;
+  }
+
+  // Итоги по площадкам (admin)
+  let admPlatSummary = '';
+  const admPlatTotals = {};
+  plats.forEach(p => { admPlatTotals[p.id] = 0; });
+  for(let d=1;d<=days;d++){ plats.forEach(p=>{ if(eMap[d]?.[p.id]) admPlatTotals[p.id]+=eMap[d][p.id]; }); }
+  plats.filter(p=>admPlatTotals[p.id]>0).forEach(p => {
+    admPlatSummary += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>${p.name}</span>
+      <b>$${admPlatTotals[p.id].toFixed(0)}</b></div>`;
+  });
+  if(refTot>0) admPlatSummary += `<div style="display:flex;justify-content:space-between;padding:6px 0">
+    <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block"></span>Реф.бонусы</span>
+    <b>$${refTot.toFixed(0)}</b></div>`;
+
   page.innerHTML = `
     <div class="back-btn" id="back-to-models">← Все модели</div>
     <div class="card">
@@ -523,6 +604,8 @@ async function openModelDetail(tgId) {
       </div>
       <div class="cal-grid">${calCells}</div>
       <div class="plat-legend">${calLegend}</div>
+      ${admPlatSummary ? `<div style="margin-top:14px"><div class="card-title" style="margin-bottom:8px">По площадкам</div>${admPlatSummary}</div>` : ''}
+      ${admDetailRows ? `<div style="margin-top:14px"><div class="card-title" style="margin-bottom:8px">Детализация</div>${admDetailRows}</div>` : ''}
     </div>
 
     <div class="card">

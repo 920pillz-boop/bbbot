@@ -555,6 +555,14 @@ async def adm_view(callback: CallbackQuery):
         await callback.answer("Пользователь не найден")
         return
 
+    # Если у модели есть фото — показываем его отдельным сообщением
+    photo_id = (anketa or {}).get("photo_file_id")
+    if photo_id:
+        try:
+            await callback.message.answer_photo(photo=photo_id, caption="📷 Фото профиля")
+        except Exception:
+            pass
+
     text = build_model_card("ru", user, anketa, len(refs))
     kb = admin_model_keyboard(model_tg_id, user["status"], list_status, offset)
     await callback.message.edit_text(text, reply_markup=kb)
