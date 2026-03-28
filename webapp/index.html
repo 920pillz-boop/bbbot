@@ -260,16 +260,16 @@ async function loadEarnings(targetId) {
   const url = `/api/earnings/${state.year}/${state.month}` + (tid ? `?tg_id=${tid}` : '');
   const data = await api(url);
 
-  // Площадки: из профиля или из entries
-  let plats = [];
-  if (!targetId && state.profile) {
+  // Площадки: всегда из entries (достоверные данные), + из профиля для цветов если нет earnings
+  const seenPlats = {};
+  (data.entries||[]).forEach(e => {
+    if (!seenPlats[e.platform_id])
+      seenPlats[e.platform_id] = { id: e.platform_id, name: e.platform, color: e.color };
+  });
+  let plats = Object.values(seenPlats);
+  // Если данных нет за этот месяц — берём назначенные площадки для легенды
+  if (plats.length === 0 && !targetId && state.profile) {
     plats = state.profile.platforms || [];
-  } else {
-    const seen = {};
-    (data.entries||[]).forEach(e => {
-      if (!seen[e.platform_id]) seen[e.platform_id] = { id:e.platform_id, name:e.platform, color:e.color };
-    });
-    plats = Object.values(seen);
   }
 
   // Карты данных по дням

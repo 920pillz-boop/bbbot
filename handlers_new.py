@@ -92,17 +92,17 @@ async def edit_photo_save(message: Message, state: FSMContext):
     await db.upsert_anketa(tg_id, photo_file_id=file_id)
     await state.clear()
 
-    # Show updated profile with the new photo
+    # Show updated profile with photo as caption
     from handlers import build_profile_text
     from keyboards import profile_edit_keyboard
     user = await db.get_user(tg_id)
     anketa = await db.get_anketa(tg_id) or {}
+    kb = profile_edit_keyboard(lang)
     profile_text = t(lang, "photo_saved") + "\n\n" + build_profile_text(lang, anketa, user["status"])
     try:
-        await message.answer_photo(photo=file_id)
+        await message.answer_photo(photo=file_id, caption=profile_text, reply_markup=kb)
     except Exception:
-        pass
-    await message.answer(profile_text, reply_markup=profile_edit_keyboard(lang))
+        await message.answer(profile_text, reply_markup=kb)
 
 
 # ─── WRITE TO MANAGER ────────────────────────────────────────────────────────

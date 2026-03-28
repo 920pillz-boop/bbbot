@@ -273,12 +273,14 @@ async def menu_profile(message: Message, state: FSMContext):
     anketa = await db.get_anketa(tg_id) or {}
     text = build_profile_text(lang, anketa, user["status"])
     photo_id = anketa.get("photo_file_id")
+    kb = profile_edit_keyboard(lang)
     if photo_id:
         try:
-            await message.answer_photo(photo=photo_id)
+            await message.answer_photo(photo=photo_id, caption=text, reply_markup=kb)
+            return
         except Exception:
-            pass
-    await message.answer(text, reply_markup=profile_edit_keyboard(lang))
+            pass  # fallback: если caption слишком длинный — отправим текстом
+    await message.answer(text, reply_markup=kb)
 
 
 # ─── EDIT FIELD — REQUEST ────────────────────────────────────────────────────
@@ -326,12 +328,14 @@ async def edit_save(message: Message, state: FSMContext):
     anketa = await db.get_anketa(tg_id) or {}
     text = t(lang, "field_updated") + "\n\n" + build_profile_text(lang, anketa, user["status"])
     photo_id = anketa.get("photo_file_id")
+    kb = profile_edit_keyboard(lang)
     if photo_id:
         try:
-            await message.answer_photo(photo=photo_id)
+            await message.answer_photo(photo=photo_id, caption=text, reply_markup=kb)
+            return
         except Exception:
             pass
-    await message.answer(text, reply_markup=profile_edit_keyboard(lang))
+    await message.answer(text, reply_markup=kb)
 
 
 # ─── MAIN MENU — LANGUAGE ────────────────────────────────────────────────────
