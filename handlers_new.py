@@ -28,7 +28,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import database as db
 from config import ADMIN_CHAT_ID, MANAGER_USERNAME
 from translations import t, ts
-from keyboards import payout_confirm_keyboard, manager_keyboard
+from keyboards import manager_keyboard
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -91,7 +91,18 @@ async def edit_photo_save(message: Message, state: FSMContext):
     file_id = message.photo[-1].file_id
     await db.upsert_anketa(tg_id, photo_file_id=file_id)
     await state.clear()
-    await message.answer(t(lang, "photo_saved"))
+
+    # Show updated profile with the new photo
+    from handlers import build_profile_text
+    from keyboards import profile_edit_keyboard
+    user = await db.get_user(tg_id)
+    anketa = await db.get_anketa(tg_id) or {}
+    profile_text = t(lang, "photo_saved") + "\n\n" + build_profile_text(lang, anketa, user["status"])
+    try:
+        await message.answer_photo(photo=file_id)
+    except Exception:
+        pass
+    await message.answer(profile_text, reply_markup=profile_edit_keyboard(lang))
 
 
 # ─── WRITE TO MANAGER ────────────────────────────────────────────────────────
@@ -104,100 +115,6 @@ async def menu_write_manager(message: Message):
     lang = await get_lang(tg_id)
     text = t(lang, "manager_link", username=MANAGER_USERNAME)
     await message.answer(text, reply_markup=manager_keyboard(lang, MANAGER_USERNAME))
-
-
-# ─── PAYOUT REQUEST ──────────────────────────────────────────────────────────
-
-@router.message(F.text.in_(["💸 Запросить выплату", "💸 Request payout"]))
-async def menu_payout(message: Message):
-    tg_id = message.from_user.id
-    if not check_rate(tg_id):
-        return
-    lang = await get_lang(tg_id)
-    user = await db.get_user(tg_id)
-    if not user:
-        return
-    balance = user.get("balance", 0) or 0
-    if balance <= 0:
-        await message.answer(t(lang, "payout_no_balance"))
-        return
-    text = t(lang, "payout_balance", balance=balance)
-    await message.answer(text, reply_markup=payout_confirm_keyboard(lang))
-
-
-@router.callback_query(F.data == "payout:confirm")
-async def cb_payout_confirm(callback: CallbackQuery, bot: Bot):
-    tg_id = callback.from_user.id
-    lang = await get_lang(tg_id)
-    user = await db.get_user(tg_id)
-    if not user:
-        await callback.answer()
-        return
-
-    balance = user.get("balance", 0) or 0
-    if balance <= 0:
-        await callback.message.edit_text(t(lang, "payout_no_balance"))
-        await callback.answer()
-        return
-
-    request_id = await db.create_payout_request(tg_id, balance)
-
-    # Notify admin
-    anketa = await db.get_anketa(tg_id) or {}
-    name = anketa.get("full_name") or user.get("tg_username") or str(tg_id)
-    try:
-        builder = InlineKeyboardBuilder()
-        builder.button(
-            text="✅ Одобрить выплату",
-            callback_data=f"adm:payout:approve:{request_id}"
-        )
-        await bot.send_message(
-            ADMIN_CHAT_ID,
-            t("ru", "admin_payout_request", name=name, tg_id=tg_id, amount=balance),
-            reply_markup=builder.as_markup()
-        )
-    except Exception as e:
-        logger.warning(f"Cannot notify admin about payout request: {e}")
-
-    await callback.message.edit_text(t(lang, "payout_sent"))
-    await callback.answer()
-
-
-@router.callback_query(F.data == "payout:cancel")
-async def cb_payout_cancel(callback: CallbackQuery):
-    lang = await get_lang(callback.from_user.id)
-    await callback.message.edit_text(t(lang, "edit_cancelled"))
-    await callback.answer()
-
-
-@router.callback_query(F.data.startswith("adm:payout:approve:"))
-async def cb_adm_payout_approve(callback: CallbackQuery, bot: Bot):
-    if callback.from_user.id != ADMIN_CHAT_ID:
-        await callback.answer("⛔")
-        return
-    request_id = int(callback.data.split(":")[3])
-    await db.update_payout_request(request_id, "approved")
-
-    # Find the request to notify the model
-    requests = await db.get_payout_requests(status="approved")
-    req = next((r for r in requests if r["id"] == request_id), None)
-    if req:
-        model_lang = "ru"
-        model_user = await db.get_user(req["tg_id"])
-        if model_user:
-            model_lang = model_user.get("language", "ru")
-        try:
-            await bot.send_message(
-                req["tg_id"],
-                f"✅ Ваш запрос на выплату <b>{req['amount']:.2f} ₽</b> одобрен!"
-            )
-        except Exception as e:
-            logger.warning(f"Cannot notify model about payout approval: {e}")
-
-    await callback.message.edit_text(
-        callback.message.text + "\n\n✅ <b>Одобрено</b>"
-    )
-    await callback.answer("✅ Выплата одобрена")
 
 
 # ─── ADMIN BROADCAST ─────────────────────────────────────────────────────────

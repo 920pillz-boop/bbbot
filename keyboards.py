@@ -44,7 +44,6 @@ def main_menu(lang: str, tg_id: int) -> ReplyKeyboardMarkup:
     builder.button(text=t(lang, "btn_channel"))
     builder.button(text="📱 Личный кабинет")
     builder.button(text=t(lang, "btn_lang"))
-    builder.button(text=t(lang, "btn_payout"))
     builder.button(text=t(lang, "btn_write_manager"))
     if tg_id == ADMIN_CHAT_ID:
         builder.button(text=t(lang, "btn_admin"))
@@ -114,16 +113,6 @@ def manager_keyboard(lang: str, manager_username: str) -> InlineKeyboardMarkup:
         text=t(lang, "btn_write_manager"),
         url=f"https://t.me/{manager_username}"
     )
-    return builder.as_markup()
-
-
-# ─── PAYOUT ──────────────────────────────────────────────────────────────────
-
-def payout_confirm_keyboard(lang: str) -> InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.button(text=t(lang, "btn_payout_confirm"), callback_data="payout:confirm")
-    builder.button(text=t(lang, "btn_cancel"), callback_data="payout:cancel")
-    builder.adjust(2)
     return builder.as_markup()
 
 

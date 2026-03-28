@@ -558,56 +558,6 @@ async def api_admin_notes_post(request: web.Request) -> web.Response:
     return web.json_response({"ok": True})
 
 
-# ─── API NEW: запросы на выплату ─────────────────────────────────────────────
-
-async def api_admin_payout_requests(request: web.Request) -> web.Response:
-    """GET /api/admin/payout-requests"""
-    tg_user = get_user_from_request(request)
-    if not tg_user or not is_admin_user(tg_user):
-        return web.json_response({"error": "forbidden"}, status=403)
-
-    requests = await db.get_payout_requests(status="pending")
-    return web.json_response({
-        "requests": [
-            {
-                "id": r["id"],
-                "tg_id": r["tg_id"],
-                "username": r.get("tg_username"),
-                "full_name": r.get("full_name"),
-                "amount": r["amount"],
-                "created_at": r["created_at"],
-            }
-            for r in requests
-        ]
-    })
-
-
-async def api_admin_payout_approve(request: web.Request) -> web.Response:
-    """POST /api/admin/payout-requests/{id}/approve"""
-    tg_user = get_user_from_request(request)
-    if not tg_user or not is_admin_user(tg_user):
-        return web.json_response({"error": "forbidden"}, status=403)
-
-    request_id = int(request.match_info["id"])
-    await db.update_payout_request(request_id, "approved")
-
-    # Notify model
-    bot = request.app.get("bot")
-    if bot:
-        requests_list = await db.get_payout_requests(status="approved")
-        req = next((r for r in requests_list if r["id"] == request_id), None)
-        if req:
-            try:
-                await bot.send_message(
-                    req["tg_id"],
-                    f"✅ Ваш запрос на выплату <b>{req['amount']:.2f} ₽</b> одобрен!"
-                )
-            except Exception as e:
-                logger.warning(f"Cannot notify model {req['tg_id']} about payout approval: {e}")
-
-    return web.json_response({"ok": True})
-
-
 # ─── API NEW: рассылка ───────────────────────────────────────────────────────
 
 async def api_admin_broadcast(request: web.Request) -> web.Response:
@@ -667,8 +617,6 @@ def create_app(bot=None) -> web.Application:
     app.router.add_post("/api/admin/cancel-earning", api_admin_cancel_earning)
     app.router.add_get("/api/admin/notes/{tg_id}", api_admin_notes_get)
     app.router.add_post("/api/admin/notes/{tg_id}", api_admin_notes_post)
-    app.router.add_get("/api/admin/payout-requests", api_admin_payout_requests)
-    app.router.add_post("/api/admin/payout-requests/{id}/approve", api_admin_payout_approve)
     app.router.add_post("/api/admin/broadcast", api_admin_broadcast)
 
     # Static

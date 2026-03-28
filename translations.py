@@ -38,14 +38,12 @@ TEXTS = {
         "btn_admin":    "🔧 Админка",
         "btn_lang":     "🌍 Язык",
         "btn_write_manager": "💬 Написать менеджеру",
-        "btn_payout":        "💸 Запросить выплату",
-        "btn_payout_confirm": "✅ Подтвердить",
 
         "bonus_message": (
             "🎁 <b>Ваш бонус!</b>\n\n"
             "Свяжитесь с нашим менеджером для получения персонального бонуса:\n\n"
             "👤 <b>Менеджер:</b> @agansyown\n\n"
-            "Напишите менеджеру — он подберёт лучшее предложение для вас!"
+            "Напишите менеджеру — он поможет вам начать работу!"
         ),
 
         # ── profile ──
@@ -60,17 +58,30 @@ TEXTS = {
             "active": "Активная модель",
         },
         "field_names": {
-            "full_name": "Имя и фамилия",
-            "height": "Рост",
-            "weight": "Вес",
-            "phone_model": "Модель телефона",
-            "socials": "Соцсети",
-            "location": "Место проживания",
-            "limits": "Мои табу",
-            "desired_income": "Желаемый доход",
-            "experience": "Опыт работы",
-            "goals": "Цели",
+            "full_name": "👤 Имя и фамилия",
+            "height": "📏 Рост",
+            "weight": "⚖️ Вес",
+            "phone_model": "📱 Модель телефона",
+            "socials": "🔗 Соцсети",
+            "location": "📍 Место проживания",
+            "limits": "🚫 Табу",
+            "desired_income": "💰 Желаемый доход",
+            "experience": "💼 Опыт работы",
+            "goals": "🎯 Цели",
             "photo_file_id": "📷 Фото профиля",
+        },
+        "edit_prompts": {
+            "full_name": "👤 Введите ваше имя и фамилию:",
+            "height": "📏 Введите ваш рост в сантиметрах:",
+            "weight": "⚖️ Введите ваш вес в килограммах:",
+            "phone_model": "📱 Введите модель вашего телефона:",
+            "socials": "🔗 Введите ссылки или ники ваших аккаунтов (Instagram, TikTok и т.д.):",
+            "location": "📍 Введите ваш город и страну:",
+            "limits": "🚫 Что вы не готовы делать в работе?",
+            "desired_income": "💰 Какой уровень заработка вы хотите в месяц?",
+            "experience": "💼 Опишите ваш опыт работы (или напишите «нет опыта»):",
+            "goals": "🎯 Что вы хотите получить от работы с агентством?",
+            "photo_file_id": "📷 Отправьте фото для профиля:",
         },
         "edit_field": "✏️ Введите новое значение для поля <b>{field}</b>:",
         "field_updated": "✅ Поле обновлено!",
@@ -156,20 +167,6 @@ TEXTS = {
         # ── new v2 keys ──
         "write_manager": "💬 Написать менеджеру",
         "manager_link": "👤 Напишите нашему менеджеру:\n@{username}",
-        "payout_request": "💸 Запросить выплату баланса",
-        "payout_balance": (
-            "💰 Ваш реферальный баланс: <b>{balance:.2f} ₽</b>\n\n"
-            "Подтвердить запрос на выплату?"
-        ),
-        "payout_sent": "✅ Запрос на выплату отправлен!",
-        "payout_no_balance": "❌ Баланс равен нулю.",
-        "payout_confirm": "✅ Подтвердить",
-        "admin_payout_request": (
-            "💸 <b>Запрос на выплату!</b>\n\n"
-            "👤 {name}\n"
-            "🆔 <code>{tg_id}</code>\n"
-            "💰 Сумма: <b>{amount:.2f} ₽</b>"
-        ),
         "broadcast_prompt": "📢 Введите сообщение для рассылки всем активным моделям:",
         "broadcast_done": "✅ Рассылка отправлена {count} моделям.",
         "weekly_summary": (
@@ -228,14 +225,12 @@ TEXTS = {
         "btn_admin":    "🔧 Admin panel",
         "btn_lang":     "🌍 Language",
         "btn_write_manager": "💬 Write to manager",
-        "btn_payout":        "💸 Request payout",
-        "btn_payout_confirm": "✅ Confirm",
 
         "bonus_message": (
             "🎁 <b>Your bonus!</b>\n\n"
             "Contact our manager to get your personal bonus:\n\n"
             "👤 <b>Manager:</b> @agansyown\n\n"
-            "Write to the manager — they'll find the best offer for you!"
+            "Write to the manager — they'll help you get started!"
         ),
 
         "profile_title": "📋 <b>Your profile</b>\n\n",
@@ -249,17 +244,30 @@ TEXTS = {
             "active": "Active model",
         },
         "field_names": {
-            "full_name": "Full name",
-            "height": "Height",
-            "weight": "Weight",
-            "phone_model": "Phone model",
-            "socials": "Social media",
-            "location": "Location",
-            "limits": "My taboos",
-            "desired_income": "Desired income",
-            "experience": "Work experience",
-            "goals": "Goals",
+            "full_name": "👤 Full name",
+            "height": "📏 Height",
+            "weight": "⚖️ Weight",
+            "phone_model": "📱 Phone model",
+            "socials": "🔗 Social media",
+            "location": "📍 Location",
+            "limits": "🚫 Taboos",
+            "desired_income": "💰 Desired income",
+            "experience": "💼 Work experience",
+            "goals": "🎯 Goals",
             "photo_file_id": "📷 Profile photo",
+        },
+        "edit_prompts": {
+            "full_name": "👤 Enter your full name:",
+            "height": "📏 Enter your height in centimeters:",
+            "weight": "⚖️ Enter your weight in kilograms:",
+            "phone_model": "📱 Enter your phone model:",
+            "socials": "🔗 Enter your social media links or usernames (Instagram, TikTok, etc.):",
+            "location": "📍 Enter your city and country:",
+            "limits": "🚫 What are you NOT willing to do at work?",
+            "desired_income": "💰 How much do you want to earn per month?",
+            "experience": "💼 Describe your work experience (or write «no experience»):",
+            "goals": "🎯 What do you want to get from working with the agency?",
+            "photo_file_id": "📷 Send a photo for your profile:",
         },
         "edit_field": "✏️ Enter new value for <b>{field}</b>:",
         "field_updated": "✅ Field updated!",
@@ -342,20 +350,6 @@ TEXTS = {
         # ── new v2 keys ──
         "write_manager": "💬 Write to manager",
         "manager_link": "👤 Write to our manager:\n@{username}",
-        "payout_request": "💸 Request balance payout",
-        "payout_balance": (
-            "💰 Your referral balance: <b>{balance:.2f} ₽</b>\n\n"
-            "Confirm payout request?"
-        ),
-        "payout_sent": "✅ Payout request sent!",
-        "payout_no_balance": "❌ Balance is zero.",
-        "payout_confirm": "✅ Confirm",
-        "admin_payout_request": (
-            "💸 <b>Payout request!</b>\n\n"
-            "👤 {name}\n"
-            "🆔 <code>{tg_id}</code>\n"
-            "💰 Amount: <b>{amount:.2f} ₽</b>"
-        ),
         "broadcast_prompt": "📢 Enter the message to broadcast to all active models:",
         "broadcast_done": "✅ Broadcast sent to {count} models.",
         "weekly_summary": (

@@ -62,15 +62,22 @@ def build_calendar_text(earnings: list[dict], year: int, month: int, month_total
         d = e["date"]
         by_day.setdefault(d, []).append(e)
 
-    lines = [f"📅 <b>{month_name(month)} {year}</b>  |  Итого: <b>${month_total:.0f}</b>\n"]
+    lines = [f"📅 <b>{month_name(month)} {year}</b>\n💵 Итого: <b>${month_total:.0f}</b>\n"]
+
     for day_str in sorted(by_day.keys()):
         day_entries = by_day[day_str]
         day_total = sum(e["amount"] for e in day_entries)
         day_num = day_str.split("-")[2]
-        plats = "  ".join(
-            f"{e['platform_name']}: ${e['amount']:.0f}" for e in day_entries
-        )
-        lines.append(f"<b>{day_num}</b> — ${day_total:.0f}    {plats}")
+
+        if len(day_entries) == 1:
+            # Одна площадка — всё в одну строку
+            e = day_entries[0]
+            lines.append(f"<b>{day_num}</b>  📌 {e['platform_name']}: <b>${e['amount']:.0f}</b>")
+        else:
+            # Несколько площадок — разбиваем по строкам
+            lines.append(f"<b>{day_num}</b>  💵 <b>${day_total:.0f}</b>")
+            for e in day_entries:
+                lines.append(f"     • {e['platform_name']}: ${e['amount']:.0f}")
 
     if not by_day:
         lines.append("Данных за этот месяц пока нет.")

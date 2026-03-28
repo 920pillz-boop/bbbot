@@ -75,9 +75,14 @@ async def send_question(message_or_callback, lang: str, step: int, state: FSMCon
 def build_profile_text(lang: str, anketa: dict, status: str) -> str:
     field_names = ts(lang, "field_names")
     statuses = ts(lang, "statuses")
+    has_photo = bool(anketa.get("photo_file_id"))
+    photo_status = "✅" if has_photo else "—"
     text = t(lang, "profile_title")
-    text += t(lang, "profile_status", status=statuses.get(status, status)) + "\n\n"
+    text += t(lang, "profile_status", status=statuses.get(status, status)) + "\n"
+    text += f"📷 <b>Фото:</b> {photo_status}\n\n"
     for field in ANKETA_FIELDS:
+        if field == "photo_file_id":
+            continue  # показываем фото отдельно, не как текст
         val = anketa.get(field) or "—"
         text += f"<b>{field_names.get(field, field)}:</b> {val}\n"
     return text
@@ -267,6 +272,12 @@ async def menu_profile(message: Message, state: FSMContext):
         return
     anketa = await db.get_anketa(tg_id) or {}
     text = build_profile_text(lang, anketa, user["status"])
+    photo_id = anketa.get("photo_file_id")
+    if photo_id:
+        try:
+            await message.answer_photo(photo=photo_id)
+        except Exception:
+            pass
     await message.answer(text, reply_markup=profile_edit_keyboard(lang))
 
 
@@ -279,13 +290,13 @@ async def cb_edit_field(callback: CallbackQuery, state: FSMContext):
         return
     tg_id = callback.from_user.id
     lang = await get_lang(tg_id)
+    edit_prompts = ts(lang, "edit_prompts")
     field_names = ts(lang, "field_names")
     await state.set_state(EditState.waiting)
     await state.update_data(edit_field=field)
-    await callback.message.answer(
-        t(lang, "edit_field", field=field_names.get(field, field)),
-        reply_markup=cancel_keyboard(lang)
-    )
+    # Используем персональный prompt для каждого поля
+    prompt = edit_prompts.get(field) or t(lang, "edit_field", field=field_names.get(field, field))
+    await callback.message.answer(prompt, reply_markup=cancel_keyboard(lang))
     await callback.answer()
 
 
@@ -307,12 +318,26 @@ async def edit_save(message: Message, state: FSMContext):
     lang = await get_lang(tg_id)
     data = await state.get_data()
     field = data.get("edit_field")
+
+    # Если редактируется фото, но пользователь прислал текст — просим фото
+    if field == "photo_file_id":
+        edit_prompts = ts(lang, "edit_prompts")
+        prompt = edit_prompts.get("photo_file_id") or t(lang, "photo_prompt")
+        await message.answer(prompt, reply_markup=cancel_keyboard(lang))
+        return
+
     if field:
         await db.upsert_anketa(tg_id, **{field: message.text})
     await state.clear()
     user = await db.get_user(tg_id)
     anketa = await db.get_anketa(tg_id) or {}
     text = t(lang, "field_updated") + "\n\n" + build_profile_text(lang, anketa, user["status"])
+    photo_id = anketa.get("photo_file_id")
+    if photo_id:
+        try:
+            await message.answer_photo(photo=photo_id)
+        except Exception:
+            pass
     await message.answer(text, reply_markup=profile_edit_keyboard(lang))
 
 
@@ -354,6 +379,17 @@ async def menu_referrals(message: Message):
     text = t(lang, "referrals_title")
     text += t(lang, "ref_link", link=ref_link)
     text += t(lang, "ref_count", count=len(refs))
+
+    # Показываем список рефералов если есть
+    if refs:
+        text += "\n"
+        for r in refs[:10]:  # не больше 10 строк
+            ref_name = r.get("tg_username") or str(r["tg_id"])
+            text += f"  • @{ref_name}\n"
+        if len(refs) > 10:
+            text += f"  <i>...и ещё {len(refs) - 10}</i>\n"
+        text += "\n"
+
     text += t(lang, "ref_balance", balance=user.get("balance", 0) or 0)
 
     if bonuses:
