@@ -10,6 +10,7 @@ handlers_earnings.py
 Не трогает существующий handlers.py.
 """
 
+import asyncio
 import logging
 from datetime import date, datetime
 
@@ -106,19 +107,17 @@ def earnings_nav_kb(tg_id: int, year: int, month: int) -> InlineKeyboardBuilder:
 async def menu_earnings(message: Message):
     tg_id = message.from_user.id
     year, month = current_ym()
-
-    earnings = await db.get_earnings_for_month(tg_id, year, month)
-    month_total = await db.get_monthly_total(tg_id, year, month)
-
-    # Прошлый месяц для сравнения
     pm, py = (month - 1, year) if month > 1 else (12, year - 1)
-    prev_total = await db.get_monthly_total(tg_id, py, pm)
+
+    earnings, month_total, prev_total, platforms = await asyncio.gather(
+        db.get_earnings_for_month(tg_id, year, month),
+        db.get_monthly_total(tg_id, year, month),
+        db.get_monthly_total(tg_id, py, pm),
+        db.get_model_platforms(tg_id),
+    )
 
     text = build_calendar_text(earnings, year, month, month_total)
     text += f"\n\n📌 Прошлый месяц: <b>${prev_total:.0f}</b>"
-
-    # Площадки модели
-    platforms = await db.get_model_platforms(tg_id)
     if platforms:
         plat_names = ", ".join(p["platform_name"] for p in platforms)
         text += f"\n🔗 Площадки: {plat_names}"

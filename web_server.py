@@ -6,6 +6,7 @@ aiohttp-сервер для Telegram Mini App.
 Запускается параллельно с ботом из bot.py.
 """
 
+import asyncio
 import csv
 import hashlib
 import hmac
@@ -151,12 +152,14 @@ async def api_me(request: web.Request) -> web.Response:
         return web.json_response({"error": "unauthorized"}, status=401)
 
     tg_id = tg_user["id"]
-    user = await db.get_user(tg_id)
+    user, anketa, platforms = await asyncio.gather(
+        db.get_user(tg_id),
+        db.get_anketa(tg_id),
+        db.get_model_platforms(tg_id),
+    )
     if not user:
         return web.json_response({"error": "not_found"}, status=404)
-
-    anketa = await db.get_anketa(tg_id) or {}
-    platforms = await db.get_model_platforms(tg_id)
+    anketa = anketa or {}
 
     return web.json_response({
         "user": {
@@ -396,13 +399,15 @@ async def api_admin_model_detail(request: web.Request) -> web.Response:
         return web.json_response({"error": "forbidden"}, status=403)
 
     target_id = int(request.match_info["tg_id"])
-    user = await db.get_user(target_id)
+    user, anketa, all_platforms, model_plats = await asyncio.gather(
+        db.get_user(target_id),
+        db.get_anketa(target_id),
+        db.get_all_platforms(),
+        db.get_model_platforms(target_id),
+    )
     if not user:
         return web.json_response({"error": "not_found"}, status=404)
-
-    anketa = await db.get_anketa(target_id) or {}
-    all_platforms = await db.get_all_platforms()
-    model_plats = await db.get_model_platforms(target_id)
+    anketa = anketa or {}
     assigned_ids = {p["platform_id"] for p in model_plats}
 
     return web.json_response({

@@ -1,3 +1,4 @@
+import asyncio
 import math
 import logging
 
@@ -133,11 +134,10 @@ async def cmd_start(message: Message, state: FSMContext, bot: Bot):
         except ValueError:
             pass
 
-    existing = await db.get_user(tg_id)
-    if not existing:
-        await db.create_user(tg_id, username, ref_by=ref_by)
-
     user = await db.get_user(tg_id)
+    if not user:
+        await db.create_user(tg_id, username, ref_by=ref_by)
+        user = await db.get_user(tg_id)
     lang = user["language"]
 
     # If already filled form — show main menu
@@ -268,11 +268,11 @@ async def menu_profile(message: Message, state: FSMContext):
     await state.clear()
     tg_id = message.from_user.id
     lang = await get_lang(tg_id)
-    user = await db.get_user(tg_id)
+    user, anketa = await asyncio.gather(db.get_user(tg_id), db.get_anketa(tg_id))
     if not user:
         await message.answer(t(lang, "start_prompt"))
         return
-    anketa = await db.get_anketa(tg_id) or {}
+    anketa = anketa or {}
     text = build_profile_text(lang, anketa, user["status"])
     photo_id = anketa.get("photo_file_id")
     kb = profile_edit_keyboard(lang)
@@ -326,8 +326,8 @@ async def edit_save(message: Message, state: FSMContext):
     if field:
         await db.upsert_anketa(tg_id, **{field: message.text})
     await state.clear()
-    user = await db.get_user(tg_id)
-    anketa = await db.get_anketa(tg_id) or {}
+    user, anketa = await asyncio.gather(db.get_user(tg_id), db.get_anketa(tg_id))
+    anketa = anketa or {}
     text = t(lang, "field_updated") + "\n\n" + build_profile_text(lang, anketa, user["status"])
     photo_id = anketa.get("photo_file_id")
     kb = profile_edit_keyboard(lang)
@@ -551,9 +551,11 @@ async def adm_view(callback: CallbackQuery):
     list_status = parts[3]
     offset = int(parts[4])
 
-    user = await db.get_user(model_tg_id)
-    anketa = await db.get_anketa(model_tg_id)
-    refs = await db.get_referrals(model_tg_id)
+    user, anketa, refs = await asyncio.gather(
+        db.get_user(model_tg_id),
+        db.get_anketa(model_tg_id),
+        db.get_referrals(model_tg_id),
+    )
 
     if not user:
         await callback.answer("Пользователь не найден")
@@ -611,10 +613,12 @@ async def adm_set_status(callback: CallbackQuery, bot: Bot):
         except Exception as e:
             logger.warning(f"Cannot notify {model_tg_id}: {e}")
 
-    # Refresh view — one final get_user
-    updated_user = await db.get_user(model_tg_id)
-    anketa = await db.get_anketa(model_tg_id)
-    refs = await db.get_referrals(model_tg_id)
+    # Refresh view — parallel fetch
+    updated_user, anketa, refs = await asyncio.gather(
+        db.get_user(model_tg_id),
+        db.get_anketa(model_tg_id),
+        db.get_referrals(model_tg_id),
+    )
     text = build_model_card("ru", updated_user, anketa, len(refs))
     kb = admin_model_keyboard(model_tg_id, new_status, "all", 0)
     # Если текущее сообщение — фото (с caption), редактируем caption; иначе text
