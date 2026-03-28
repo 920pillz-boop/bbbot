@@ -90,14 +90,18 @@ TEXTS = {
         # ── referrals ──
         "referrals_title": "🤝 <b>Реферальная программа</b>\n\n",
         "ref_link": "🔗 Ваша реферальная ссылка:\n<code>{link}</code>\n\n",
-        "ref_count": "👥 Приглашено: <b>{count}</b> чел.\n",
-        "ref_balance": "💰 Баланс: <b>{balance:.2f} ₽</b>\n\n",
+        "ref_count": "👥 Зарегистрировалось по вашей ссылке: <b>{count}</b> чел.\n",
+        "ref_balance": "💰 Реф. баланс: <b>{balance:.2f} ₽</b>\n\n",
         "ref_bonuses_title": "📈 Последние начисления:\n",
         "ref_bonus_item": "• +{amount:.2f} ₽\n",
-        "ref_no_bonuses": "Начислений пока нет.",
+        "ref_no_bonuses": "Начислений пока нет.\n",
         "ref_program_info": (
-            "\n\nℹ️ <b>Условия программы:</b>\n"
-            "Вы получаете <b>5%</b> от дохода каждой приглашённой модели."
+            "\nℹ️ <b>Как работает:</b>\n"
+            "1. Поделитесь ссылкой с новым пользователем\n"
+            "2. Они нажимают её и впервые запускают бот (/start)\n"
+            "3. Они становятся вашим рефералом автоматически\n"
+            "4. Вы получаете <b>5%</b> от их дохода\n\n"
+            "⚠️ Если человек уже запускал бот раньше — он не засчитается."
         ),
 
         # ── notifications ──
@@ -275,14 +279,18 @@ TEXTS = {
 
         "referrals_title": "🤝 <b>Referral program</b>\n\n",
         "ref_link": "🔗 Your referral link:\n<code>{link}</code>\n\n",
-        "ref_count": "👥 Invited: <b>{count}</b> people\n",
-        "ref_balance": "💰 Balance: <b>{balance:.2f} ₽</b>\n\n",
+        "ref_count": "👥 Registered via your link: <b>{count}</b> people\n",
+        "ref_balance": "💰 Ref. balance: <b>{balance:.2f} ₽</b>\n\n",
         "ref_bonuses_title": "📈 Recent bonuses:\n",
         "ref_bonus_item": "• +{amount:.2f} ₽\n",
-        "ref_no_bonuses": "No bonuses yet.",
+        "ref_no_bonuses": "No bonuses yet.\n",
         "ref_program_info": (
-            "\n\nℹ️ <b>Program terms:</b>\n"
-            "You receive <b>5%</b> of income from each invited model."
+            "\nℹ️ <b>How it works:</b>\n"
+            "1. Share your link with a new user\n"
+            "2. They click it and launch the bot for the first time (/start)\n"
+            "3. They become your referral automatically\n"
+            "4. You receive <b>5%</b> of their income\n\n"
+            "⚠️ If the person already used the bot before — they won't count."
         ),
 
         "notify_approved": (

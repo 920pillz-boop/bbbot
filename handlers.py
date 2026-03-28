@@ -312,19 +312,12 @@ async def cb_edit_cancel(callback: CallbackQuery, state: FSMContext):
 
 # ─── EDIT FIELD — SAVE ───────────────────────────────────────────────────────
 
-@router.message(EditState.waiting)
+@router.message(EditState.waiting, F.text)  # только текст — фото перехватывает handlers_new
 async def edit_save(message: Message, state: FSMContext):
     tg_id = message.from_user.id
     lang = await get_lang(tg_id)
     data = await state.get_data()
     field = data.get("edit_field")
-
-    # Если редактируется фото, но пользователь прислал текст — просим фото
-    if field == "photo_file_id":
-        edit_prompts = ts(lang, "edit_prompts")
-        prompt = edit_prompts.get("photo_file_id") or t(lang, "photo_prompt")
-        await message.answer(prompt, reply_markup=cancel_keyboard(lang))
-        return
 
     if field:
         await db.upsert_anketa(tg_id, **{field: message.text})
