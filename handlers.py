@@ -12,7 +12,7 @@ from translations import t, ts
 from keyboards import (
     lang_keyboard, start_form_keyboard, back_keyboard,
     main_menu, profile_edit_keyboard, cancel_keyboard,
-    channel_keyboard, webapp_keyboard, webapp_inline_keyboard,
+    channel_keyboard, website_keyboard, webapp_keyboard, webapp_inline_keyboard,
     admin_main_keyboard, admin_model_keyboard, admin_list_keyboard,
     ANKETA_FIELDS
 )

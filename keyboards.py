@@ -5,7 +5,7 @@ from aiogram.types import (
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from translations import t, ts
-from config import CHANNEL_LINK, WEBAPP_URL, ADMIN_CHAT_ID
+from config import CHANNEL_LINK, WEBSITE_LINK, WEBAPP_URL, ADMIN_CHAT_ID
 
 
 # ─── LANGUAGE ────────────────────────────────────────────────────────────────
@@ -92,6 +92,12 @@ def channel_keyboard(lang: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
+def website_keyboard(lang: str) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text=t(lang, "btn_website"), url=WEBSITE_LINK)
+    return builder.as_markup()
+
+
 def webapp_keyboard(lang: str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="📱 Открыть кабинет", web_app=WebAppInfo(url=WEBAPP_URL))
@@ -103,23 +109,27 @@ def webapp_keyboard(lang: str) -> InlineKeyboardMarkup:
 def admin_main_keyboard(lang: str = "ru") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="📊 Статистика",      callback_data="adm:stats")
+    builder.button(text="💰 Заработок",       callback_data="adm:earnings")
     builder.button(text="🆕 Новые заявки",    callback_data="adm:list:reviewing:0")
     builder.button(text="📋 Все модели",      callback_data="adm:list:all:0")
     builder.button(text="✅ Одобренные",      callback_data="adm:list:approved:0")
     builder.button(text="🟢 Активные",        callback_data="adm:list:active:0")
-    builder.adjust(1)
+    builder.adjust(2, 1, 1, 1, 1)
     return builder.as_markup()
 
 
 def admin_model_keyboard(tg_id: int, status: str, list_status: str, offset: int, lang: str = "ru") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    if status != "approved":
+    has_approve = status != "approved"
+    has_reject  = status != "rejected"
+    if has_approve:
         builder.button(text=t(lang, "btn_approve"),  callback_data=f"adm:set:{tg_id}:approved")
-    if status != "rejected":
+    if has_reject:
         builder.button(text=t(lang, "btn_reject"),   callback_data=f"adm:set:{tg_id}:rejected")
     builder.button(text=t(lang, "btn_back_list"),  callback_data=f"adm:list:{list_status}:{offset}")
     builder.button(text=t(lang, "btn_back_admin"), callback_data="adm:home")
-    builder.adjust(2, 1, 1)
+    action_count = (1 if has_approve else 0) + (1 if has_reject else 0)
+    builder.adjust(action_count if action_count > 0 else 1, 1, 1)
     return builder.as_markup()
 
 

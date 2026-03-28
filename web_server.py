@@ -177,7 +177,7 @@ async def api_me(request: web.Request) -> web.Response:
             "goals": anketa.get("goals"),
         },
         "platforms": [
-            {"id": p["platform_id"], "name": p["platform_name"], "slug": p["slug"]}
+            {"id": p["platform_id"], "name": p["platform_name"], "slug": p["slug"], "color": p["color_hex"]}
             for p in platforms
         ],
         "is_admin": is_admin_user(tg_user),

@@ -4,6 +4,9 @@ from config import DB_PATH, REF_PERCENT
 
 async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
+        # WAL-режим: параллельные читатели не блокируют запись
+        await db.execute("PRAGMA journal_mode=WAL")
+        await db.execute("PRAGMA synchronous=NORMAL")
         # ── Оригинальные таблицы ──────────────────────────────────────────
         await db.execute("""
             CREATE TABLE IF NOT EXISTS users (

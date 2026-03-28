@@ -63,7 +63,11 @@ async def main():
     web_runner = await start_web_server(bot=bot)
 
     try:
-        await dp.start_polling(bot, allowed_updates=["message", "callback_query"])
+        await dp.start_polling(
+            bot,
+            allowed_updates=["message", "callback_query"],
+            drop_pending_updates=True,
+        )
     finally:
         await web_runner.cleanup()
         await bot.session.close()
