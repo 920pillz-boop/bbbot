@@ -253,13 +253,17 @@ async def get_all_users(status: str | None = None, offset: int = 0, limit: int =
         db.row_factory = aiosqlite.Row
         if status:
             async with db.execute(
-                "SELECT * FROM users WHERE status=? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                "SELECT u.*, a.full_name FROM users u "
+                "LEFT JOIN anketa a ON a.tg_id = u.tg_id "
+                "WHERE u.status=? ORDER BY u.created_at DESC LIMIT ? OFFSET ?",
                 (status, limit, offset)
             ) as cur:
                 rows = await cur.fetchall()
         else:
             async with db.execute(
-                "SELECT * FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                "SELECT u.*, a.full_name FROM users u "
+                "LEFT JOIN anketa a ON a.tg_id = u.tg_id "
+                "ORDER BY u.created_at DESC LIMIT ? OFFSET ?",
                 (limit, offset)
             ) as cur:
                 rows = await cur.fetchall()
@@ -326,6 +330,28 @@ async def get_model_platforms(tg_id: int) -> list[dict]:
         """, (tg_id,)) as cur:
             rows = await cur.fetchall()
             return [dict(r) for r in rows]
+
+
+async def get_platforms_batch(tg_ids: list[int]) -> dict[int, list[str]]:
+    """Returns {tg_id: [platform_name, ...]} for multiple users at once."""
+    if not tg_ids:
+        return {}
+    placeholders = ",".join("?" for _ in tg_ids)
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            f"SELECT mp.tg_id, p.name as platform_name "
+            f"FROM model_platforms mp "
+            f"JOIN platforms p ON p.id = mp.platform_id "
+            f"WHERE mp.tg_id IN ({placeholders}) AND mp.is_active=1 "
+            f"ORDER BY p.sort_order",
+            tg_ids
+        ) as cur:
+            rows = await cur.fetchall()
+    result: dict[int, list[str]] = {tid: [] for tid in tg_ids}
+    for row in rows:
+        result[row["tg_id"]].append(row["platform_name"])
+    return result
 
 
 async def set_model_platform(tg_id: int, platform_id: int, account_url: str = None, is_active: bool = True):

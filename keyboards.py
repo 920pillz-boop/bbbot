@@ -132,18 +132,23 @@ def admin_main_keyboard(lang: str = "ru") -> InlineKeyboardMarkup:
 
 def admin_model_keyboard(tg_id: int, status: str, list_status: str, offset: int, lang: str = "ru") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    has_approve = status != "approved"
-    has_reject  = status != "rejected"
-    if has_approve:
+    action_count = 0
+    # Show Approve for new/filling/reviewing/rejected (not already approved or active)
+    if status in ("new", "filling", "reviewing", "rejected"):
         builder.button(text=t(lang, "btn_approve"),  callback_data=f"adm:set:{tg_id}:approved")
-    if has_reject:
+        action_count += 1
+    # Show Activate only for approved models
+    if status == "approved":
+        builder.button(text=t(lang, "btn_activate"), callback_data=f"adm:set:{tg_id}:active")
+        action_count += 1
+    # Show Reject for everyone except already rejected
+    if status != "rejected":
         builder.button(text=t(lang, "btn_reject"),   callback_data=f"adm:set:{tg_id}:rejected")
+        action_count += 1
     builder.button(text=t(lang, "btn_back_list"),  callback_data=f"adm:list:{list_status}:{offset}")
     builder.button(text=t(lang, "btn_back_admin"), callback_data="adm:home")
-    # Notes and History buttons
     builder.button(text="📝 Заметки",   callback_data=f"adm:notes:{tg_id}")
     builder.button(text="📋 История",   callback_data=f"adm:history:{tg_id}")
-    action_count = (1 if has_approve else 0) + (1 if has_reject else 0)
     builder.adjust(action_count if action_count > 0 else 1, 1, 1, 2)
     return builder.as_markup()
 
@@ -158,7 +163,7 @@ def admin_list_keyboard(
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for m in models:
-        name = m.get("tg_username") or str(m["tg_id"])
+        name = m.get("full_name") or m.get("tg_username") or str(m["tg_id"])
         label = f"👤 {name} — {m['status']}"
         builder.button(
             text=label,

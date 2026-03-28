@@ -23,6 +23,8 @@ router = Router()
 
 PAGE_SIZE = 5
 
+_bot_username: str | None = None
+
 # ─── FORM FIELD KEYS (ordered) ──────────────────────────────────────────────
 
 FORM_QUESTIONS = [
@@ -369,8 +371,11 @@ async def menu_referrals(message: Message):
     refs = await db.get_referrals(tg_id)
     bonuses = await db.get_ref_bonuses(tg_id)
 
-    bot_me = await message.bot.get_me()
-    bot_info_name = bot_me.username or "your_bot"
+    global _bot_username
+    if _bot_username is None:
+        bot_me = await message.bot.get_me()
+        _bot_username = bot_me.username or "your_bot"
+    bot_info_name = _bot_username
     ref_link = f"https://t.me/{bot_info_name}?start=ref_{tg_id}"
 
     text = t(lang, "referrals_title")
@@ -521,11 +526,10 @@ async def adm_list(callback: CallbackQuery):
 
     # Build short list text
     lines = []
+    statuses_map = ts("ru", "statuses")
     for m in models:
-        anketa = await db.get_anketa(m["tg_id"])
-        name = (anketa or {}).get("full_name") or m.get("tg_username") or str(m["tg_id"])
-        statuses = ts("ru", "statuses")
-        lines.append(f"• {name} — {statuses.get(m['status'], m['status'])}")
+        name = m.get("full_name") or m.get("tg_username") or str(m["tg_id"])
+        lines.append(f"• {name} — {statuses_map.get(m['status'], m['status'])}")
     text = header + "\n".join(lines)
 
     kb = admin_list_keyboard(models, status_filter, offset, total, PAGE_SIZE)
@@ -589,12 +593,11 @@ async def adm_set_status(callback: CallbackQuery, bot: Bot):
 
     old_model = await db.get_user(model_tg_id)
     old_status = old_model["status"] if old_model else "unknown"
+    lang = old_model["language"] if old_model else "ru"
     await db.update_user(model_tg_id, status=new_status)
     await db.add_status_history(model_tg_id, old_status, new_status)
 
-    # Notify the model
-    model = await db.get_user(model_tg_id)
-    lang = model["language"] if model else "ru"
+    # Notify the model (lang already set from old_model)
     notify_map = {
         "approved": "notify_approved",
         "rejected": "notify_rejected",
@@ -606,10 +609,11 @@ async def adm_set_status(callback: CallbackQuery, bot: Bot):
         except Exception as e:
             logger.warning(f"Cannot notify {model_tg_id}: {e}")
 
-    # Refresh view
+    # Refresh view — one final get_user
+    updated_user = await db.get_user(model_tg_id)
     anketa = await db.get_anketa(model_tg_id)
     refs = await db.get_referrals(model_tg_id)
-    text = build_model_card("ru", await db.get_user(model_tg_id), anketa, len(refs))
+    text = build_model_card("ru", updated_user, anketa, len(refs))
     kb = admin_model_keyboard(model_tg_id, new_status, "all", 0)
     # Если текущее сообщение — фото (с caption), редактируем caption; иначе text
     if callback.message.photo:

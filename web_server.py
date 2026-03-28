@@ -369,10 +369,11 @@ async def api_admin_models_list(request: web.Request) -> web.Response:
         return web.json_response({"error": "forbidden"}, status=403)
 
     models = await db.get_all_models_for_admin()
+    tg_ids = [m["tg_id"] for m in models]
+    plats_map = await db.get_platforms_batch(tg_ids)
     result = []
     for m in models:
         name = m.get("full_name") or m.get("tg_username") or str(m["tg_id"])
-        plats = await db.get_model_platforms(m["tg_id"])
         result.append({
             "tg_id": m["tg_id"],
             "name": name,
@@ -381,7 +382,7 @@ async def api_admin_models_list(request: web.Request) -> web.Response:
             "income": m.get("income", 0),
             "balance": m.get("balance", 0),
             "has_ref": bool(m.get("ref_by")),
-            "platforms": [p["platform_name"] for p in plats],
+            "platforms": plats_map.get(m["tg_id"], []),
         })
 
     return web.json_response({"models": result})
@@ -463,14 +464,15 @@ async def api_export_earnings_csv(request: web.Request) -> web.Response:
     month = int(request.match_info["month"])
 
     models = await db.get_all_models_monthly_stats(year, month)
+    tg_ids = [m["tg_id"] for m in models]
+    plats_map = await db.get_platforms_batch(tg_ids)
 
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(["tg_id", "username", "full_name", "status", "month_total", "platforms"])
 
     for m in models:
-        plats = await db.get_model_platforms(m["tg_id"])
-        plat_names = "; ".join(p["platform_name"] for p in plats)
+        plat_names = "; ".join(plats_map.get(m["tg_id"], []))
         writer.writerow([
             m["tg_id"],
             m.get("tg_username") or "",

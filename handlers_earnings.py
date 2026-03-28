@@ -220,8 +220,7 @@ async def adm_add_earning_start(callback: CallbackQuery, state: FSMContext):
 
     builder = InlineKeyboardBuilder()
     for m in models:
-        anketa = await db.get_anketa(m["tg_id"])
-        name = (anketa or {}).get("full_name") or m.get("tg_username") or str(m["tg_id"])
+        name = m.get("full_name") or m.get("tg_username") or str(m["tg_id"])
         builder.button(text=f"👤 {name}", callback_data=f"admadd:model:{m['tg_id']}")
     builder.adjust(1)
     builder.row(InlineKeyboardBuilder().button(text="❌ Отмена", callback_data="admadd:cancel").as_markup().inline_keyboard[0][0])

@@ -48,6 +48,12 @@ def check_rate(tg_id: int, seconds: float = 2.0) -> bool:
     if now - last < seconds:
         return False
     _rate_limit[tg_id] = now
+    # Prune entries older than 60 s to prevent unbounded growth
+    if len(_rate_limit) > 500:
+        cutoff = now - 60.0
+        stale = [k for k, v in _rate_limit.items() if v < cutoff]
+        for k in stale:
+            del _rate_limit[k]
     return True
 
 
