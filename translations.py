@@ -191,6 +191,7 @@ TEXTS = {
         "status_history_title": "📋 История статусов:",
         "photo_saved": "✅ Фото сохранено!",
         "photo_prompt": "📷 Отправьте фото для профиля:",
+        "start_prompt": "Нажмите /start для начала работы.",
     },
 
     "en": {
@@ -378,6 +379,7 @@ TEXTS = {
         "status_history_title": "📋 Status history:",
         "photo_saved": "✅ Photo saved!",
         "photo_prompt": "📷 Send a photo for your profile:",
+        "start_prompt": "Press /start to begin.",
     }
 }
 

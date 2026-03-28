@@ -105,10 +105,13 @@ async def edit_photo_save(message: Message, state: FSMContext):
     anketa = await db.get_anketa(tg_id) or {}
     kb = profile_edit_keyboard(lang)
     profile_text = t(lang, "photo_saved") + "\n\n" + build_profile_text(lang, anketa, user["status"])
-    try:
-        await message.answer_photo(photo=file_id, caption=profile_text, reply_markup=kb)
-    except Exception:
-        await message.answer(profile_text, reply_markup=kb)
+    if len(profile_text) <= 1024:
+        try:
+            await message.answer_photo(photo=file_id, caption=profile_text, reply_markup=kb)
+            return
+        except Exception as e:
+            logger.warning(f"answer_photo failed after photo save for {tg_id}: {e}")
+    await message.answer(profile_text, reply_markup=kb)
 
 
 # ─── WRITE TO MANAGER ────────────────────────────────────────────────────────
@@ -181,7 +184,8 @@ async def cb_adm_notes(callback: CallbackQuery):
 
     try:
         await callback.message.edit_text(text, reply_markup=builder.as_markup())
-    except Exception:
+    except Exception as e:
+        logger.debug(f"edit_text failed in cb_adm_notes: {e}")
         await callback.message.answer(text, reply_markup=builder.as_markup())
     await callback.answer()
 
@@ -242,6 +246,7 @@ async def cb_adm_history(callback: CallbackQuery):
 
     try:
         await callback.message.edit_text("\n".join(lines), reply_markup=builder.as_markup())
-    except Exception:
+    except Exception as e:
+        logger.debug(f"edit_text failed in cb_adm_history: {e}")
         await callback.message.answer("\n".join(lines), reply_markup=builder.as_markup())
     await callback.answer()

@@ -21,6 +21,7 @@ from database import (
 from handlers import router
 from handlers_earnings import router as earnings_router, month_name as _month_name
 from handlers_new import router as new_router
+from translations import t as tr
 from web_server import start_web_server
 
 logging.basicConfig(
@@ -86,7 +87,6 @@ async def weekly_monthly_summary(bot: Bot):
                                 if e["date"] >= week_start
                             )
                             month_total = await get_monthly_total(tg_id, year, month)
-                            from translations import t as tr
                             text = tr(
                                 lang, "weekly_summary",
                                 week_total=week_total,
@@ -114,7 +114,6 @@ async def weekly_monthly_summary(bot: Bot):
                         try:
                             month_total = await get_monthly_total(tg_id, rep_year, rep_month)
                             ref_total = await get_monthly_ref_bonus_total(tg_id, rep_year, rep_month)
-                            from translations import t as tr
                             text = tr(
                                 lang, "monthly_summary",
                                 month_total=month_total,
@@ -152,7 +151,6 @@ async def admin_reminder_task(bot: Bot):
                 stale_users = await get_reviewing_users_older_than(24)
                 if stale_users:
                     count = len(stale_users)
-                    from translations import t as tr
                     text = tr("ru", "admin_reminder", count=count)
                     try:
                         await bot.send_message(ADMIN_CHAT_ID, text)

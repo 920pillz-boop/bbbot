@@ -1,5 +1,15 @@
+import logging
 import aiosqlite
 from config import DB_PATH, REF_PERCENT
+
+logger = logging.getLogger(__name__)
+
+# Allowed column names for anketa — guards against accidental injection via kwargs keys
+_ANKETA_FIELDS = frozenset({
+    "full_name", "height", "weight", "phone_model",
+    "socials", "location", "limits", "desired_income",
+    "experience", "goals", "photo_file_id",
+})
 
 
 async def init_db():
@@ -147,8 +157,8 @@ async def init_db():
         # Добавляем photo_file_id в anketa если колонки ещё нет
         try:
             await db.execute("ALTER TABLE anketa ADD COLUMN photo_file_id TEXT")
-        except Exception:
-            pass  # Колонка уже существует
+        except Exception as e:
+            logger.debug(f"photo_file_id column already exists: {e}")
 
         await db.commit()
 
@@ -193,6 +203,10 @@ async def get_anketa(tg_id: int) -> dict | None:
 
 
 async def upsert_anketa(tg_id: int, **kwargs):
+    # Guard: only allow known column names to prevent accidental SQL issues
+    unknown = set(kwargs) - _ANKETA_FIELDS
+    if unknown:
+        raise ValueError(f"upsert_anketa: unknown fields {unknown}")
     async with aiosqlite.connect(DB_PATH) as db:
         exists = await (await db.execute(
             "SELECT 1 FROM anketa WHERE tg_id=?", (tg_id,)

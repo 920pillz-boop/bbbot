@@ -270,18 +270,18 @@ async def menu_profile(message: Message, state: FSMContext):
     lang = await get_lang(tg_id)
     user = await db.get_user(tg_id)
     if not user:
-        await message.answer("Нажмите /start для начала работы.")
+        await message.answer(t(lang, "start_prompt"))
         return
     anketa = await db.get_anketa(tg_id) or {}
     text = build_profile_text(lang, anketa, user["status"])
     photo_id = anketa.get("photo_file_id")
     kb = profile_edit_keyboard(lang)
-    if photo_id:
+    if photo_id and len(text) <= 1024:
         try:
             await message.answer_photo(photo=photo_id, caption=text, reply_markup=kb)
             return
-        except Exception:
-            pass  # fallback: если caption слишком длинный — отправим текстом
+        except Exception as e:
+            logger.warning(f"answer_photo failed for {tg_id}: {e}")
     await message.answer(text, reply_markup=kb)
 
 
@@ -331,12 +331,12 @@ async def edit_save(message: Message, state: FSMContext):
     text = t(lang, "field_updated") + "\n\n" + build_profile_text(lang, anketa, user["status"])
     photo_id = anketa.get("photo_file_id")
     kb = profile_edit_keyboard(lang)
-    if photo_id:
+    if photo_id and len(text) <= 1024:
         try:
             await message.answer_photo(photo=photo_id, caption=text, reply_markup=kb)
             return
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"answer_photo failed for {tg_id}: {e}")
     await message.answer(text, reply_markup=kb)
 
 
@@ -366,7 +366,7 @@ async def menu_referrals(message: Message):
     lang = await get_lang(tg_id)
     user = await db.get_user(tg_id)
     if not user:
-        await message.answer("Нажмите /start для начала работы.")
+        await message.answer(t(lang, "start_prompt"))
         return
     refs = await db.get_referrals(tg_id)
     bonuses = await db.get_ref_bonuses(tg_id)
@@ -567,11 +567,13 @@ async def adm_view(callback: CallbackQuery):
         # Удаляем текущее сообщение и отправляем фото с текстом в одном сообщении
         try:
             await callback.message.delete()
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Could not delete message: {e}")
+        caption = text if len(text) <= 1024 else text[:1021] + "..."
         try:
-            await callback.message.answer_photo(photo=photo_id, caption=text, reply_markup=kb)
-        except Exception:
+            await callback.message.answer_photo(photo=photo_id, caption=caption, reply_markup=kb)
+        except Exception as e:
+            logger.warning(f"answer_photo failed in adm_view: {e}")
             await callback.message.answer(text, reply_markup=kb)
     else:
         await callback.message.edit_text(text, reply_markup=kb)
@@ -617,9 +619,11 @@ async def adm_set_status(callback: CallbackQuery, bot: Bot):
     kb = admin_model_keyboard(model_tg_id, new_status, "all", 0)
     # Если текущее сообщение — фото (с caption), редактируем caption; иначе text
     if callback.message.photo:
+        caption = text if len(text) <= 1024 else text[:1021] + "..."
         try:
-            await callback.message.edit_caption(caption=text, reply_markup=kb)
-        except Exception:
+            await callback.message.edit_caption(caption=caption, reply_markup=kb)
+        except Exception as e:
+            logger.warning(f"edit_caption failed in adm_set_status: {e}")
             await callback.message.answer(text, reply_markup=kb)
     else:
         await callback.message.edit_text(text, reply_markup=kb)
